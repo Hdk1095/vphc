@@ -370,6 +370,14 @@ function load_page(){
     font-size: inherit !important;
 }
 @media print {
+    /* Cỡ chữ tăng 1 size khi in chuẩn văn bản (10pt -> 11pt, 11pt -> 12pt) */
+    .font10 { font-size: 11pt !important; }
+    .font11 { font-size: 12pt !important; }
+    .font12 { font-size: 13pt !important; }
+    .font13 { font-size: 14pt !important; }
+    .font14 { font-size: 15pt !important; }
+    [contenteditable], select, .print-only { font-size: inherit !important; }
+
     .print-flex-line {
         display: flex !important;
         align-items: baseline !important;
@@ -422,11 +430,11 @@ select { font-family: inherit; font-size: inherit; }
     letter-spacing: -0.55px;
 }
 .font11 {
-    font-size: 15.2px !important;
+    font-size: 16.2px !important;
     letter-spacing: -0.55px;
 }
 .font10 {
-    font-size: 13.8px !important;
+    font-size: 14.8px !important;
     letter-spacing: -0.5px;
 }
 [contenteditable] {
@@ -507,6 +515,14 @@ select, option {
         display: none;
     }
     @media print {
+    /* Cỡ chữ tăng 1 size khi in chuẩn văn bản (10pt -> 11pt, 11pt -> 12pt) */
+    .font10 { font-size: 11pt !important; }
+    .font11 { font-size: 12pt !important; }
+    .font12 { font-size: 13pt !important; }
+    .font13 { font-size: 14pt !important; }
+    .font14 { font-size: 15pt !important; }
+    [contenteditable], select, .print-only { font-size: inherit !important; }
+
         #auth_overlay { display: none !important; }
     }
     
@@ -625,8 +641,8 @@ select, option {
 Luật Xử lý vi phạm hành chính.</span><br>
 			<span class="font10">b) Ông/bà bị xử phạt có tên tại Điều 1 bị tạm giữ <span class="o_nhap_3cm border" contenteditable></span> để bảo đảm thi hành quyết định xử phạt.</span><br>
 			<span class="font10">c) Ông/bà có tên tại Điều 1 có quyền khiếu nại hoặc khởi kiện hành chính đối với Quyết định này theo quy định của pháp luật.<br>
-2. Gửi cho Ngân hàng Agribank Lâm Hà, địa chỉ: Đường Hùng Vương, xã Đinh Văn Lâm Hà, tỉnh Lâm Đồng để thu tiền phạt.<br>
-3. Gửi cho tổ Cảnh sát trật tự để tổ chức thực hiện.</span><br>
+			<span class="font10">2. Gửi cho Ngân hàng Agribank Lâm Hà, địa chỉ: Đường Hùng Vương, xã Đinh Văn Lâm Hà, tỉnh Lâm Đồng để thu tiền phạt.</span><br>
+			<span class="font10">3. Gửi cho tổ Cảnh sát trật tự để tổ chức thực hiện.</span><br>
 			<span class="font10">4. Gửi cho <span class="o_nhap_3cm border" contenteditable></span>để biết và phối hợp thực hiện./.</span><br>
 			<table class="khung_chu_ky">
 				<tbody><tr>
