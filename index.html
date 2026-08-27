@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en" id="bieumau">
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js">
+    const DEFAULT_APP_PWD = "123";
+
+    function checkAuth() {
+        const pwdInput = document.getElementById("auth_password");
+        const err = document.getElementById("auth_error");
+        if (!pwdInput) return;
+        
+        if (pwdInput.value === DEFAULT_APP_PWD) {
+            sessionStorage.setItem("is_authenticated", "true");
+            document.getElementById("auth_overlay").style.display = "none";
+            document.body.style.overflow = "auto";
+            document.querySelectorAll(".wrapper, .button_print, .button_save, .button_reload, .button_qr").forEach(el => {
+                el.style.filter = "none";
+                el.style.pointerEvents = "auto";
+            });
+        } else {
+            err.style.display = "block";
+            pwdInput.value = "";
+            pwdInput.focus();
+        }
+    }
+
+    function initAuth() {
+        const overlay = document.getElementById("auth_overlay");
+        if (sessionStorage.getItem("is_authenticated") === "true") {{
+            if (overlay) overlay.style.display = "none";
+            document.body.style.overflow = "auto";
+        }} else {{
+            if (overlay) overlay.style.display = "flex";
+            document.body.style.overflow = "hidden";
+            document.querySelectorAll(".wrapper, .button_print, .button_save, .button_reload, .button_qr").forEach(el => {{
+                el.style.filter = "blur(6px)";
+                el.style.pointerEvents = "none";
+            }});
+            setTimeout(() => {{
+                const p = document.getElementById("auth_password");
+                if (p) p.focus();
+            }}, 200);
+        }}
+    }
+
+    window.addEventListener("DOMContentLoaded", initAuth);
+    
+</script>
+	<meta charset="UTF-8">
+	<title>Mẫu 02KTHS</title>
+	<link rel="stylesheet" href="./style.css">
+	<link rel="stylesheet" href="./print.css">
+	<script type='text/javascript'>
+		/*---------------------------------------------------------------------------------------HÀM HÀM TEXT TRÊN DÒNG LIÊN TỤC--------------------------------------------------------------------------------*/  
+			function kounset(id)
+			   {
+				   if (document.getElementById(id).innerHTML == "") {
+					   document.getElementById(id).style.display = 'inline-block';
+				   } else { document.getElementById(id).style.display = 'unset'; }
+			   }
+		/*---------------------------------------------------------------------------------------HÀM DÀNH CHO LƯU BIỂU MẪU-------------------------------------------------------------------------------*/  
+			function hide_note(id){
+				document.getElementById(id).style.display = 'none';
+					}
+					
+			
+		/*---------------------------------------------------------------------------------------HÀM TỰ ĐIỀN HỌ TÊN-------------------------------------------------------------------------------*/  
+		function syncHoTen(){
+			const hoTen = document.getElementById("ho_ten_input").innerText.trim();
+
+			/* cập nhật chữ */
+			document.querySelectorAll(".ho_ten_view").forEach(el=>{
+				el.innerText = hoTen;
+			});
+
+			/* cập nhật QR */
+			document.querySelectorAll(".qr_ho_ten").forEach(img=>{
+				if(hoTen !== ""){
+					img.src =
+					  "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="
+					  + encodeURIComponent(hoTen);
+				}else{
+					img.src = "";
+				}
+			});
+		}
+		function syncQuocTich(){
+			const val = document.getElementById("quoc_tich_input").innerText.trim();
+			document.querySelectorAll(".quoc_tich_view").forEach(el=>{
+				el.innerText = val;
+			});
+		}
+		function syncNgheNghiep(){
+			const val = document.getElementById("nghe_nghiep_input").innerText.trim();
+			document.querySelectorAll(".nghe_nghiep_view").forEach(el=>{
+				el.innerText = val;
+			});
+		}
+
+		function syncNoiO(){
+			const val = document.getElementById("noi_o_input").innerText.trim();
+			document.querySelectorAll(".noi_o_view").forEach(el=>{
+				el.innerText = val;
+			});
+		}
+
+		function syncDDCN(){
+			const v = document.getElementById("ddcn_input").innerText.trim();
+			document.querySelectorAll(".ddcn_view").forEach(el=>el.innerText=v);
+		}
+
+		function syncNgayCap(){
+			const v = document.getElementById("ngay_cap_input").innerText.trim();
+			document.querySelectorAll(".ngay_cap_view").forEach(el=>el.innerText=v);
+		}
+		function syncNgaySinh(){
+					const v = document.getElementById("ngay_sinh_input").innerText.trim();
+					document.querySelectorAll(".ngay_sinh_view").forEach(el=>el.innerText=v);
+				}
+		function syncNoiCap(){
+			const v = document.getElementById("noi_cap_input").innerText.trim();
+			document.querySelectorAll(".noi_cap_view").forEach(el=>el.innerText=v);
+		}
+		function fillFromQR(qrText){
+			const arr = qrText.split("|");
+
+			// theo chuẩn phổ biến CCCD
+			const ddcn    = arr[0] || "";
+			
+			const diaChi  = arr[1] || "";
+			const hoTen   = arr[2] || "";
+			const ngaySinh= arr[3] || "";
+			const gioiTinh  = arr[4] || "";
+			const noiO    = arr[5] || "";
+			const ngayCap = arr[6] || "";
+
+			// đổ dữ liệu
+			document.getElementById("ddcn_input").innerText = ddcn;
+			syncDDCN();
+			document.getElementById("ho_ten_input").innerText = hoTen;
+			syncHoTen();
+			
+			document.getElementById("noi_o_input").innerText = noiO;
+			syncNoiO();
+
+			document.getElementById("ngay_cap_input").innerText =
+				formatDate(ngayCap);   // 15032022 → 15/03/2022
+			syncNgayCap();
+			/* ===== NGÀY SINH ===== */
+			document.getElementById("ngay_sinh_input").innerText =
+				formatDate(ngaySinh); syncNgaySinh();   // 15032022 → 15/03/2022
+			
+			syncGioiTinh();
+			set_gt_from_qr(gioiTinh);
+		}
+		function formatDate(d){
+			if(!d || d.length !== 8) return d;
+			return d.substring(0,2)+"/"+d.substring(2,4)+"/"+d.substring(4);
+		}
+
+
+		/*---------------------------------------------------------------------------------------HÀM SELECT-------------------------------------------------------------------------------*/  
+function scanQRFromImage(input){
+    if(!input.files || !input.files[0]) return;
+
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+        const img = new Image();
+        img.onload = function(){
+
+            // 🔹 scale ảnh về kích thước hợp lý
+            const maxSize = 800;
+            let scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+            const code = jsQR(
+                imageData.data,
+                imageData.width,
+                imageData.height,
+                { inversionAttempts: "attemptBoth" } // 👈 QUAN TRỌNG
+            );
+
+            if(code){
+                fillFromQR(code.data);
+            }else{
+                alert("❌ Không đọc được QR – hãy chọn ảnh rõ, chụp gần QR");
+            }
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+
+				/*---------------------------------------------------------------------------------------HÀM chọn giới tính-------------------------------------------------------------------------------*/  
+		function on_change_gt(){
+			var get_gt = document.getElementById('gioi_tinh');
+			if(!get_gt) return;
+			var val = get_gt.value;
+			var txt = '';
+			if(val === '1') txt = 'Nam';
+			else if(val === '2') txt = 'Nữ';
+			
+			document.querySelectorAll('.gioi_tinh_view').forEach(function(el){ el.innerText = txt; });
+			
+			var nextEl = get_gt.nextElementSibling;
+			if(nextEl && nextEl.classList.contains('print-only')){
+				nextEl.innerText = txt;
+			}
+		}
+
+		function syncGioiTinh(){
+			on_change_gt();
+		}
+
+		function set_gt_from_qr(gt_qr){
+			var select = document.getElementById('gioi_tinh');
+			if(!select) return;
+			var s = (gt_qr || "").toString().toLowerCase();
+
+			if(s.includes("nam")){
+				select.value = '1';
+			}else if(s.includes("nữ") || s.includes("nu")){
+				select.value = '2';
+			}else{
+				select.value = '';
+			}
+
+			on_change_gt();
+		}
+
+
+
+		/*---------------------------------------------------------------------------------------HÀM NGƯỜI LẬP BIÊN BẢN-------------------------------------------------------------------------------*/
+		function on_change_nl(){
+    const select = document.getElementById("nguoi_lap");
+    const span = document.getElementById("nhap_nl");
+    span.innerText = select.options[select.selectedIndex].text;
+}
+
+function load_page(){
+    on_change_nl(); // đổ sẵn giá trị khi mở trang
+    document.getElementById("nhap_nl").style.display = "none";
+}
+
+
+
+		/*---------------------------------------------------------------------------------------HÀM LƯU BIỂU MẪU-------------------------------------------------------------------------------*/  		
+			function save() {
+				var htmlContent = '<!DOCTYPE html>\n<html lang="en" id="bieumau">\n' +
+					document.getElementById('bieumau').innerHTML +
+					'\n</html>';
+				var bl = new Blob([htmlContent], {type: "text/html"});
+				var a = document.createElement("a");
+				a.href = URL.createObjectURL(bl);
+				a.download = document.title + ".html";
+				a.hidden = true;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				URL.revokeObjectURL(a.href);
+			}	
+		/*---------------------------------------------------------------------------------------HÀM LOAD PAGE-------------------------------------------------------------------------------*/  		
+			 function In_bieu_mau(){
+					window.print();
+					
+				}
+    
+	
+                function syncAllSelectsForPrint() {
+            document.querySelectorAll('select').forEach(function(sel) {
+                var text = (sel.selectedIndex >= 0 && sel.value !== "") ? sel.options[sel.selectedIndex].text : "";
+                var nextEl = sel.nextElementSibling;
+                if (nextEl && nextEl.classList.contains('print-only')) {
+                    nextEl.innerText = text;
+                }
+            });
+        }
+
+        window.addEventListener('load', function() {
+            syncAllSelectsForPrint();
+            document.querySelectorAll('select').forEach(function(sel) {
+                sel.addEventListener('change', function(e) {
+                    syncAllSelectsForPrint();
+                });
+            });
+        });
+
+        window.addEventListener('beforeprint', function() {
+            syncAllSelectsForPrint();
+        });
+
+    const DEFAULT_APP_PWD = "112233";
+
+    function checkAuth() {
+        const pwdInput = document.getElementById("auth_password");
+        const err = document.getElementById("auth_error");
+        if (!pwdInput) return;
+        
+        if (pwdInput.value === DEFAULT_APP_PWD) {
+            sessionStorage.setItem("is_authenticated", "true");
+            document.getElementById("auth_overlay").style.display = "none";
+            document.body.style.overflow = "auto";
+            document.querySelectorAll(".wrapper, .button_print, .button_save, .button_reload, .button_qr").forEach(el => {
+                el.style.filter = "none";
+                el.style.pointerEvents = "auto";
+            });
+        } else {
+            err.style.display = "block";
+            pwdInput.value = "";
+            pwdInput.focus();
+        }
+    }
+
+    function initAuth() {
+        const overlay = document.getElementById("auth_overlay");
+        if (sessionStorage.getItem("is_authenticated") === "true") {{
+            if (overlay) overlay.style.display = "none";
+            document.body.style.overflow = "auto";
+        }} else {{
+            if (overlay) overlay.style.display = "flex";
+            document.body.style.overflow = "hidden";
+            document.querySelectorAll(".wrapper, .button_print, .button_save, .button_reload, .button_qr").forEach(el => {{
+                el.style.filter = "blur(6px)";
+                el.style.pointerEvents = "none";
+            }});
+            setTimeout(() => {{
+                const p = document.getElementById("auth_password");
+                if (p) p.focus();
+            }}, 200);
+        }}
+    }
+
+    window.addEventListener("DOMContentLoaded", initAuth);
+    
+</script>
+<input type="file"
+       accept="image/*"
+       onchange="scanQRFromImage(this)"
+       style="display:none"
+       id="qr_input">
+<style>
+/* CSS In Ấn: Tạo dòng chấm chấm và co giãn tự động */
+.print-flex-line {
+    display: flex;
+    align-items: baseline;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    line-height: 1.25em;
+    min-height: 1.25em;
+    box-sizing: border-box;
+}
+.print-flex-fixed {
+    white-space: nowrap;
+    margin-right: 2px;
+}
+.o_nhap_n_dong {
+    font-family: "Times New Roman", Times, serif !important;
+    font-size: inherit !important;
+}
+@media print {
+    .print-flex-line {
+        display: flex !important;
+        align-items: baseline !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: 1.25em !important;
+        min-height: 1.25em !important;
+        box-sizing: border-box !important;
+    }
+    .print-flex-fill {
+        flex-grow: 1 !important;
+        width: auto !important; 
+    }
+    .print-dotted {
+        border: none !important; 
+    }
+    [contenteditable]:empty,
+    .print-dotted:empty {
+        border: none !important;
+        border-bottom: 1px dotted #000 !important; 
+        display: inline-block !important;
+        height: 0.85em !important;
+        min-height: 0.85em !important;
+        line-height: 0.85em !important;
+        vertical-align: baseline !important;
+        align-self: baseline !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+    }
+    select { display: none !important; }
+    .print-only { display: inline-block !important; min-height: 1em; min-width: 2cm; }
+    .o_nhap_n_dong {
+        font-family: "Times New Roman", Times, serif !important;
+        font-size: inherit !important;
+        line-height: 1.25em !important;
+    }
+    .o_nhap_n_dong:empty {
+        min-height: 1.25em !important;
+        height: 1.25em !important;
+    }
+}
+
+.print-only { display: none; }
+select { font-family: inherit; font-size: inherit; }
+
+/* Kiểu chữ dáng cao, chữ khít nhau cho toàn bộ 4 mẫu biên bản */
+.wrapper, .content, body {
+    letter-spacing: -0.55px;
+}
+.font11 {
+    font-size: 15.2px !important;
+    letter-spacing: -0.55px;
+}
+.font10 {
+    font-size: 13.8px !important;
+    letter-spacing: -0.5px;
+}
+[contenteditable] {
+    letter-spacing: -0.55px;
+}
+select, option {
+    letter-spacing: -0.55px;
+}
+
+    #auth_overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background: rgba(30, 41, 59, 0.95);
+        backdrop-filter: blur(8px);
+        z-index: 999999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Times New Roman', sans-serif;
+    }
+    .auth_card {
+        background: #ffffff;
+        padding: 30px 25px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        width: 320px;
+        text-align: center;
+        animation: fadeIn 0.3s ease;
+    }
+    .auth_card h3 {
+        margin: 0 0 8px 0;
+        color: #0f172a;
+        font-size: 17px;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+    .auth_card p {
+        margin: 0 0 20px 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+    .auth_input_group {
+        margin-bottom: 15px;
+    }
+    .auth_input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    .auth_input:focus {
+        border-color: #2563eb;
+    }
+    .auth_btn {
+        width: 100%;
+        background: #1e3a8a;
+        color: white;
+        border: none;
+        padding: 10px;
+        font-size: 14px;
+        font-weight: bold;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .auth_btn:hover {
+        background: #1d4ed8;
+    }
+    #auth_error {
+        color: #ef4444;
+        font-size: 12px;
+        margin-bottom: 12px;
+        display: none;
+    }
+    @media print {
+        #auth_overlay { display: none !important; }
+    }
+    
+</style>
+</head>
+
+
+<body class="font14 ta_jus">
+
+<div id="auth_overlay">
+    <div class="auth_card">
+        <h3>🔒 XÁC THỰC TRUY CẬP</h3>
+        <p>Vui lòng nhập mật khẩu để mở biểu mẫu</p>
+        <div class="auth_input_group">
+            <input type="password" id="auth_password" class="auth_input" placeholder="Nhập mật khẩu..." onkeydown="if(event.key==='Enter') checkAuth()">
+        </div>
+        <div id="auth_error">❌ Mật khẩu không chính xác!</div>
+        <button class="auth_btn" onclick="checkAuth()">Mở khóa</button>
+    </div>
+</div>
+
+	<div class="wrapper border">
+		<div class="header">
+			<div class="cq_banhanh f_left ta_center font11">
+				<span style="display:block;height:0.8em"></span>
+
+				<span contenteditable class="co_quan">CÔNG AN TỈNH LÂM ĐỒNG</span><br>
+				<span contenteditable class=" fontBold Co_quan">CÔNG AN XÃ TÂN HÀ LÂM HÀ</span><br>
+				
+				<div style='min-height:1px;border-top:1px solid black; width: 1.5cm;margin:0 auto' ></div>
+				Số: <span class="o_nhap_1cm ta_left border" contenteditable=""></span>/QĐ-XPHC</span>
+			</div>
+			<div class="td_bieumau ta_center f_right lh_06" style='margin-right:1.5cm'>
+				<span class="font10 ">Mẫu quyết định sô 02</span><br>
+			</div>
+			<div class="quochieu ta_center f_left">
+				
+				<span class="fontUpper fontBold font11">cộng hòa xã hội chủ nghĩa Việt nam</span><br>
+				
+				<span class="fontBold font11 ">Độc lập - Tự do - Hạnh phúc</span>
+				<hr style="width: 4.5cm;border: none;border-top: 1px solid black;margin:0 auto;height: 0;">
+			</div>
+			<div class="time_header font11 font_I">
+				<span class="dia_danh" >Tân Hà Lâm Hà</span>, ngày <span class="o_nhap_ngay border" contenteditable=""></span> tháng <span class="o_nhap_thang border" contenteditable=""></span> năm <span class="o_nhap_nam border" contenteditable=""></span>
+			</div>
+		</div>
+		<div class="content">
+			<div class="font11	 fontBold ta_center fontUpper clear"><br>QUYẾT ĐỊNH</div>
+			<div class="font11	 ta_center">Xử phạt vi phạm hành chính</div>
+			<div class="font11	 fontBold ta_center fontUpper clear"><br>TRƯỞNG CÔNG AN XÃ TÂN HÀ LÂM HÀ</div>
+			<br>
+			<span class="font10 font_I">Căn cứ Điều 57, Điều 68, Điều 70, Điều 78, Điều 85 Luật Xử lý vi phạm hành chính (sửa đổi, bổ sung năm 2020;2025);</span><br>
+			<span class="font10 font_I">Căn cứ Nghị định số:168/2024/NĐ-CP ngày 26/12/2024 được sửa đổi, bổ sung theo nghị định 238/2026/NĐ-CP ngày 26/06/2026 của Chính phủ quy định xử phạt vi phạm hành chính về trật tự, an toàn giao thông trong lĩnh vực giao thông đường bộ;</span><br>
+			<span class="font10 font_I">Căn cứ Biên bản vi phạm hành chính số: <span class="o_nhap_1cm border" contenteditable></span>/BB-VPHC lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span></span><br>
+			<span class="font10 font_I">Căn cứ Biên bản phiên giải trình trực tiếp số: <span class="o_nhap_1cm border" contenteditable></span>/BB-GTTT lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span>(nếu có)</span><br>
+			<span class="font10 font_I">Căn cứ Biên bản số: <span class="o_nhap_1cm border" contenteditable></span>/BB-XM lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span>xác minh tình tiết của vụ việc vi phạm hành chính</span><br>
+			<span class="font10 font_I">Căn cứ Quyết định số: <span class="o_nhap_1cm border" contenteditable></span>/QĐ-GQXP ngày  <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span>về việc giao quyền xử phạt vi phạm hành chính.</span>
+			<div class="font11	fontBold ta_center fontUpper clear"><br>QUYẾT ĐỊNH</div>
+			<span class="font10 fontBold">Điều 1.<br>
+			</span><span class="font10">1. Xử phạt vi phạm hành chính đối với ông/bà có tên sau đây:</span>
+			<div class="print-flex-line font10">
+				<span class="print-flex-fixed">Họ và tên:&nbsp;</span><span class="o_nhap_2cm border" contenteditable id="ho_ten_input" onkeyup="syncHoTen()"></span>
+				<span class="TAB"></span>
+				<span class="print-flex-fixed">&nbsp;Giới tính:&nbsp;</span>
+				<select id="gioi_tinh" onchange="syncGioiTinh()">
+					<option value="">-- Chọn --</option>
+					<option value="1">Nam</option>
+					<option value="2">Nữ</option>
+				</select><span class="print-only border print-dotted"></span>
+				<span class="TAB"></span>
+				<span class="print-flex-fixed">&nbsp;Ngày, tháng, năm sinh:&nbsp;</span>
+				<span class="o_nhap_2cm border" contenteditable id="ngay_sinh_input" onkeyup="syncNgaySinh()"></span>
+			</div>
+			<div class="print-flex-line font10">
+				<span class="print-flex-fixed">Quốc tịch:&nbsp;</span><span class="o_nhap_2cm border" contenteditable id="quoc_tich_input" onkeyup="syncQuocTich()">Việt Nam</span>
+				<span class="TAB"></span>
+				<span class="print-flex-fixed">&nbsp;Nghề nghiệp:&nbsp;</span><span class="o_nhap_3cm border" contenteditable id="nghe_nghiep_input" onkeyup="syncNgheNghiep()">Tự do</span>
+			</div>
+			<div class="print-flex-line font10">
+				<span class="print-flex-fixed">Nơi ở hiện tại:&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable id="noi_o_input" onkeyup="syncNoiO()"></span>
+			</div>
+			<div class="print-flex-line font10">
+				<span class="print-flex-fixed">Số định danh cá nhân:&nbsp;</span><span class="o_nhap_3cm border" contenteditable id="ddcn_input" onkeyup="syncDDCN()"></span>
+				<span class="TAB"></span>
+				<span class="print-flex-fixed">Ngày cấp:&nbsp;</span><span class="o_nhap_2cm border" contenteditable id="ngay_cap_input" onkeyup="syncNgayCap()"></span>
+				<span class="TAB"></span>
+				<span class="print-flex-fixed">Nơi cấp:&nbsp;</span>
+				<select id="noi_cap_input" onchange="syncNoiCap(); var t=this.options[this.selectedIndex].text; if(this.value=='')t=''; document.querySelectorAll('.noi_cap_view').forEach(e=>e.innerText=t);">
+					<option value="">-- Chọn --</option>
+					<option value="Cục Cảnh sát QLHC về TTXH">Cục Cảnh sát QLHC về TTXH</option>
+					<option value="Bộ Công an">Bộ Công an</option>
+				</select><span class="print-only border print-dotted"></span>
+			</div>
+			<div class="font10" style="line-height: 1.25em; margin: 0; padding: 0;">2. Đã thực hiện hành vi vi phạm hành chính:<br><span class="o_nhap_n_dong border" contenteditable></span></div>
+			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">3. Quy định tại: <span class="o_nhap_3cm border" contenteditable></span>Nghị định 168/2024/NĐ-CP ngày 26/12/2024 được sửa đổi, bổ sung theo nghị định 238/2026/NĐ-CP ngày 26/06/2026 của Chính phủ quy định xử phạt vi phạm hành chính về trật tự, an toàn giao thông trong lĩnh vực giao thông đường bộ.</div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">4. Các tình tiết tăng nặng (nếu có):&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">5. Các tình tiết giảm nhẹ (nếu có):&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">6. Bị áp dụng hình thức xử phạt, biện pháp khắc phục hậu quả như sau:</div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">a) Hình thức xử phạt chính:&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable>Phạt tiền</span></div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">Cụ thể:&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable>Mức tiền phạt: 500.000 đồng</span></div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">b) Hình thức xử phạt bổ sung (nếu có):&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">Thời hạn thực hiện hình thức xử phạt bổ sung là <span class="o_nhap_3cm border" contenteditable></span> ngày/tháng, kể từ ngày nhận được Quyết định này.</div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">c) Biện pháp khắc phục hậu quả (nếu có):&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">Cụ thể:&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">Thời hạn thực hiện biện pháp khắc phục hậu quả <span class="o_nhap_3cm border" contenteditable></span> ngày, kể từ ngày nhận được Quyết định này.</div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">Những nội dung trực tiếp liên quan đến việc thực hiện biện pháp khắc phục hậu quả (nếu có):&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">Mọi chi phí tổ chức thi hành biện pháp khắc phục hậu quả do ông bà bị xử phạt có tên tại Điều này chi trả</div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">Ông/bà có tên tại Điều này phải hoàn trả số kinh phí là:&nbsp;</span><span class="o_nhap_3cm border" contenteditable></span>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">Cho&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div></div>
+			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">là cơ quan đã thực hiện biện pháp khắc phục hậu quả theo quy định tại khoản 5 Điều 85 Luật Xử lý vi phạm hành chính.</div>
+			<span class="font10 fontBold">Điều 2.</span><span class="font10"> Quyết định này có hiệu lực thi hành kể từ ký.</span><br>
+			<span class="font10 fontBold">Điều 3.</span><span class="font10"> Quyết định này được:</span><br>
+			<span class="font10">1. Giao cho ông/bà  <span class="ho_ten_view"></span> là cá nhân bị xử phạt có tên tại Điều 1 Quyết định này để chấp hành.</span><br>
+			<span class="font10">Ông/bà có tên tại Điều 1 phải nghiêm chỉnh chấp hành Quyết định xử phạt này. Nếu quá thời hạn mà ông/bà <span class="ho_ten_view"></span> không tự nguyện chấp hành thì sẽ bị cưỡng chế thi hành theo quy định của pháp luật.</span><br>
+			<span class="font10">Hoặc ông/bà  bị xử phạt có tên tại Điều 1 nộp tiền phạt tại chỗ cho người đã ra quyết định xử phạt theo quy định tại khoản 2 Điều 78 
+Luật Xử lý vi phạm hành chính.</span><br>
+			<span class="font10">b) Ông/bà bị xử phạt có tên tại Điều 1 bị tạm giữ <span class="o_nhap_3cm border" contenteditable></span> để bảo đảm thi hành quyết định xử phạt.</span><br>
+			<span class="font10">c) Ông/bà có tên tại Điều 1 có quyền khiếu nại hoặc khởi kiện hành chính đối với Quyết định này theo quy định của pháp luật.<br>
+2. Gửi cho Ngân hàng Agribank Lâm Hà, địa chỉ: Đường Hùng Vương, xã Đinh Văn Lâm Hà, tỉnh Lâm Đồng để thu tiền phạt.<br>
+3. Gửi cho tổ Cảnh sát trật tự để tổ chức thực hiện.</span><br>
+			<span class="font10">4. Gửi cho <span class="o_nhap_3cm border" contenteditable></span>để biết và phối hợp thực hiện./.</span><br>
+			<table class="khung_chu_ky">
+				<tbody><tr>
+					<td class="fontBold font_I ta_left lh_1">
+						<span>Nơi nhận:</span><br>
+						<span class="fontNorm font8 font_I ">
+- Như Điều 3;<br>
+- Lưu: Hồ sơ.<br>
+</span><br>
+					</td>
+					<td class="ta_center lh_1">
+						<span>TRƯỞNG CÔNG AN XÃ</span><br>
+					</td>
+				</tr>
+			</tbody></table>
+			<div class="page_break"></div>
+			<div class="font10 ta_center">Quyết định đã giao trực tiếp cho cá nhân bị xử phạt vào hồi .... giờ .... phút, ngày ……/……/…….</div><br>
+			<div class="nguoi_nhan_qd">
+    <div class="fontBold">NGƯỜI NHẬN QUYẾT ĐỊNH</div>
+    <div class="font10 fontI">(Ký, ghi rõ họ và tên)</div>
+</div>
+</div>
+</div>
+<div class="page_break"></div>
+
+
+
+<!--------------Page2------------------------>
+<body class="font14 ta_jus">
+	<div class="wrapper border mau_20">
+		<div class="header">
+			<div class="cq_banhanh f_left ta_center font11">
+				<span style="display:block;height:0.8em"></span>
+
+				<span contenteditable class="co_quan">CÔNG AN TỈNH LÂM ĐỒNG</span><br>
+				<span contenteditable class=" fontBold Co_quan">CÔNG AN XÃ TÂN HÀ LÂM HÀ</span><br>
+				
+				<div style='min-height:1px;border-top:1px solid black; width: 1.5cm;margin:0 auto' ></div>
+				Số: <span class="o_nhap_1cm ta_left border" contenteditable=""></span>/QĐ-TG</span>
+			</div>
+			<div class="td_bieumau ta_center f_right lh_06" style='margin-right:1.5cm'>
+				<span class="font10 ">Mẫu quyết định sô 20</span><br>
+			</div>
+			<div class="quochieu ta_center f_left">
+				
+				<span class="fontUpper fontBold font11">cộng hòa xã hội chủ nghĩa Việt nam</span><br>
+				
+				<span class="fontBold font11 ">Độc lập - Tự do - Hạnh phúc</span>
+				<hr style="width: 4.5cm;border: none;border-top: 1px solid black;margin:0 auto;height: 0;">
+			</div>
+			<div class="time_header font11 font_I">
+				<span class="dia_danh" >Tân Hà Lâm Hà</span>, ngày <span class="o_nhap_ngay border" contenteditable=""></span> tháng <span class="o_nhap_thang border" contenteditable=""></span> năm <span class="o_nhap_nam border" contenteditable=""></span>
+			</div>
+		</div>
+		<div class="content">
+			<div class="font11	 fontBold ta_center fontUpper clear"><br>QUYẾT ĐỊNH</div>
+			<div class="font11	 fontBold ta_center">Tạm giữ tang vật, phương tiện vi phạm hành chính,<br>giấy phép, chứng chỉ hành nghề
+</div>
+			<div class="font11	 fontBold ta_center fontUpper clear"><br>TRƯỞNG CÔNG AN XÃ TÂN HÀ LÂM HÀ</div>
+			<br>
+			<span class="TAB"></span><span class="font11 font_I">Căn cứ Điều 125 Luật Xử lý vi phạm hành chính (sửa đổi, bổ sung năm 2020 và năm 2025);</span><br>
+			<span class="TAB"></span><span class="font11 font_I">Căn cứ Biên bản số: <span class="o_nhap_1cm border" contenteditable></span>/BB-TG lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> tạm giữ tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề/Biên bản vi phạm hành chính số: <span class="o_nhap_1cm border" contenteditable></span>/BB-VPHC lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span></span><br>
+			<span class="TAB"></span><span class="font11 font_I">Căn cứ Quyết định số: <span class="o_nhap_1cm border" contenteditable></span>/QĐ-GQXP ngày  <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span>về việc giao quyền xử phạt vi phạm hành chính (nếu có).</span><br>
+			<div class="font11	fontBold ta_center fontUpper clear"><br>QUYẾT ĐỊNH</div>
+			<span class="TAB"></span><span class="font11 fontBold">Điều 1.<br></span>
+			<span class="TAB"></span><span class="font11">1. Tạm giữ  <span class="font_I">(tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề)</span>  đối với <span class="font_I">(ông (bà)/tổ chức)</span> có tên sau đây:</span><br>
+			<span class="TAB"></span><span class="font11">Họ và tên: <span class="ho_ten_view"></span><span class="TAB font11"></span>
+			<span class="font11 tab">
+			Giới tính:<span class="gioi_tinh_view"></span><br>
+
+			<span class="TAB"></span><span class="font11">Ngày, tháng, năm sinh: <span class="ngay_sinh_view"></span></span>
+			<span class="tab2 font11">
+			Quốc tịch:
+			<span class="quoc_tich_view">Việt Nam</span>
+			</span>
+			<span class="tab1 font11">
+			Nghề nghiệp:
+			<span class="nghe_nghiep_view">Tự do</span>
+			</span><br>
+			<span class="TAB"></span><span class="font11">Nơi ở hiện tại:
+			<span class="noi_o_view"></span>
+			</span><br>
+			<span class="TAB"></span><span class="font11">Số định danh cá nhân:
+			<span class="ddcn_view"></span>
+			</span>
+
+			<span class="TAB"></span>
+
+			<span class="font11">
+			Ngày cấp:
+			<span class="ngay_cap_view"></span>
+			</span>
+
+			<span class="TAB"></span>
+
+			<span class="font11">
+			Nơi cấp:
+			<span class="noi_cap_view"></span>
+			</span>
+			<div class="print-flex-line font11"><span class="TAB"></span><span class="print-flex-fixed">Tên của tổ chức:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="print-flex-line font11"><span class="TAB"></span><span class="print-flex-fixed">Địa chỉ trụ sở chính:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="font11">
+				<span class="TAB"></span>Mã số doanh nghiệp:<span class="o_nhap_3cm border print-dotted" contenteditable></span>Số GCN đăng ký đầu tư/doanh nghiệp hoặc GP thành lập/đăng ký hoạt động:	
+				<span class="TAB"></span><span class="o_nhap_3cm border print-dotted" contenteditable></span>Ngày cấp:<span class="o_nhap_2cm border print-dotted" contenteditable></span>Nơi cấp:<span class="o_nhap_2cm border print-dotted" contenteditable></span>
+			</div>
+			<div class="print-flex-line font11"><span class="TAB"></span><span class="print-flex-fixed">Người đại diện theo pháp luật:</span><span class="o_nhap_3cm border print-dotted" contenteditable></span><span class="tab"></span><span class="print-flex-fixed">Giới tính:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="print-flex-line font11"><span class="TAB"></span><span class="print-flex-fixed">Chức danh:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<span class="TAB"></span><span class="font11">2. Tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề bị tạm giữ theo biên bản tạm giữ kèm theo Quyết định này.<br>
+			<span class="TAB"></span><span class="font11">3. Lý do tạm giữ:</span><br>
+			<span class="o_nhap_n_dong border" style="text-indent: 1cm;" contenteditable> + Để bảo đảm thi hành quyết định xử phạt theo quy định tại khoản 6 và khoản 7 Điều 125 Luật Xử
+lý vi phạm hành chính số 15/2012/QH13 được sửa đổi, bổ sung bởi Luật số 67/2020/QH14 và Luật số
+88/2025/QH15</span>
+			<span class="TAB"></span><span class="font11">4. Thời hạn tạm giữ: <span class="o_nhap_0,5cm border" contenteditable> 07 </span>ngày, từ ngày <span class="o_nhap_3cm border" contenteditable></span> đến ngày <span class="o_nhap_3cm border" contenteditable></span><br>
+			<span class="TAB"></span><span class="font11">5. Địa điểm tạm giữ: <span class="o_nhap_3cm border" contenteditable>Công an xã Tân Hà Lâm Hà, Tỉnh Lâm Đồng</span><br>
+			<span class="TAB"></span><span class="font11">6.Việc niêm phong tang vật, phương tiện vi phạm hành chính bị tạm giữ theo thủ tục hành chính được lập thành biên bản kèm theo Quyết định này <span class="font_I">(nếu có).</span><br>
+			<span class="TAB"></span><span class="font11 fontBold">Điều 2.</span><span class="font11"> Quyết định này có hiệu lực thi hành kể từ ký.</span><br>
+			<span class="TAB"></span><span class="font11 fontBold">Điều 3.</span><span class="font11"> Quyết định này được:</span><br>
+			<span class="TAB"></span><span class="font11">1. Giao cho ông (bà): <span class="ho_ten_view"></span> là  (cá nhân/người đại diện của tổ chức)  bị áp dụng biện pháp ngăn chặn tạm giữ  (tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề) có tên tại Điều 1 Quyết định này để chấp hành.</span><br>
+			<span class="TAB"></span><span class="font11">a) Ông (bà)/Tổ chức bị áp dụng biện pháp ngăn chặn tạm giữ (tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề) có tên tại Điều 1 phải nghiêm chỉnh chấp hành Quyết định này.<br>
+			<span class="TAB"></span><span class="font11">b) Ông (bà)/Tổ chức  <span class="ho_ten_view"></span> có quyền khiếu nại hoặc khởi kiện hành chính đối với Quyết định này theo quy định của pháp luật.<br>
+			<span class="TAB"></span><span class="font11">2. Gửi cho <span class="o_nhap_3cm border" contenteditable>Công an xã Tân Hà Lâm Hà </span> để tổ chức thực hiện.</span><br>
+			<span class="TAB"></span><span class="font11">3. Gửi cho <span class="o_nhap_3cm border" contenteditable></span>để biết và phối hợp thực hiện./.</span><br>
+			<table class="khung_chu_ky">
+				<tbody><tr>
+					<td class="fontBold font_I ta_left lh_1">
+						<span>Nơi nhận:</span><br>
+						<span class="fontNorm font8 font_I ">
+- Như Điều 3;<br>
+- Lưu: Hồ sơ.<br>
+</span><br>
+					</td>
+					<td class="ta_center lh_1">
+						<span>TRƯỞNG CÔNG AN XÃ<br>
+					<span class="fontNorm font8 font_I">
+						(Ký, đóng dấu (nếu có); ghi rõ họ và tên)
+					</td>
+				</tr>
+			</tbody></table>
+			<div class="page_break"></div>
+			<div class="font10 ta_center">Quyết định đã giao trực tiếp cho <span class="font_I">(cá nhân/người đại diện của tổ chức)</span> bị áp dụng biện pháp ngăn chặn tạm giữ <span class="font_I">(tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề)</span> vào hồi  .... giờ .... phút, ngày ……/……/…….</div><br>
+			<div class="nguoi_nhan_qd">
+    <div class="fontBold">NGƯỜI NHẬN QUYẾT ĐỊNH</div>
+    <div class="font10 font_I">(Ký, ghi rõ họ và tên)</div>
+</div
+</div>
+</div>
+</div>
+<div class="page_break"></div>
+<!--------------Page3------------------------>
+<body class="font14 ta_jus">
+	<div class="wrapper border">
+		<div class="header">
+			<div class="cq_banhanh f_left ta_center font11">
+				<span style="display:block;height:0.8em"></span>
+
+				<span contenteditable class="co_quan">CÔNG AN TỈNH LÂM ĐỒNG</span><br>
+				<span contenteditable class=" fontBold Co_quan">CÔNG AN XÃ TÂN HÀ LÂM HÀ</span><br>
+				
+				<div style='min-height:1px;border-top:1px solid black; width: 1.5cm;margin:0 auto' ></div>
+				Số: <span class="o_nhap_1cm ta_left border" contenteditable=""></span>/QĐ-TL</span>
+			</div>
+			<div class="td_bieumau ta_center f_right lh_06" style='margin-right:1.5cm'>
+				<span class="font10 ">Mẫu quyết định sô 24</span><br>
+			</div>
+			<div class="quochieu ta_center f_left">
+				
+				<span class="fontUpper fontBold font11">cộng hòa xã hội chủ nghĩa Việt nam</span><br>
+				
+				<span class="fontBold font11 ">Độc lập - Tự do - Hạnh phúc</span>
+				<hr style="width: 4.5cm;border: none;border-top: 1px solid black;margin:0 auto;height: 0;">
+			</div>
+			<div class="time_header font11 font_I">
+				<span class="dia_danh" >Tân Hà Lâm Hà</span>, ngày <span class="o_nhap_ngay border" contenteditable=""></span> tháng <span class="o_nhap_thang border" contenteditable=""></span> năm <span class="o_nhap_nam border" contenteditable=""></span>
+			</div>
+		</div>
+		<div class="content">
+			<div class="font11	 fontBold ta_center fontUpper clear"><br>QUYẾT ĐỊNH</div>
+			<div class="font11	 fontBold ta_center">Trả lại tang vật, phương tiện vi phạm hành chính,<br>
+giấy phép, chứng chỉ hành nghề bị tạm giữ
+
+</div>
+			<div class="font11	 fontBold ta_center fontUpper clear"><br>TRƯỞNG CÔNG AN XÃ TÂN HÀ LÂM HÀ</div>
+			<br>
+			<span class="TAB"></span><span class="font11 font_I">Căn cứ Điều 126 Luật Xử lý vi phạm hành chính (sửa đổi, bổ sung năm 2020 và năm 2025);</span><br>
+			<span class="TAB"></span><span class="font11 font_I">Căn cứ Biên bản số: <span class="o_nhap_1cm border" contenteditable></span>/QD-TG lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> tạm giữ tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề;</span><br>
+			<span class="TAB"></span><span class="font11 font_I">Căn cứ Quyết định số: <span class="o_nhap_1cm border" contenteditable></span>/QĐ-KDTG ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> kéo dài thời hạn tạm giữ tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề (nếu có);</span><br>
+			<span class="TAB"></span><span class="font11 font_I">Căn cứ Quyết định số: <span class="o_nhap_1cm border" contenteditable></span>/QĐ-GQXP ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> về việc giao quyền xử phạt vi phạm hành chính (nếu có).</span><br>
+			<div class="font11	fontBold ta_center fontUpper clear"><br>QUYẾT ĐỊNH</div>
+			<span class="TAB"></span><span class="font11 fontBold">Điều 1.<br></span>
+			<span class="TAB"></span><span class = "font11 ">1. Trả lại <span class = "font_I">&lt;tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề&gt;</span> đã bị tạm giữ theo Quyết định số: <span class="o_nhap_1cm border" contenteditable></span>/QĐ-TG &lt;và Quyết định số: <span class="o_nhap_1cm border" contenteditable></span>QĐ-KDTG&gt; cho <span class = "font_I">&lt;ông (bà)/ tổ chức&gt; </span>có tên sau đây:</span><br>
+			<span class="TAB"></span><span class="font11 font_I">Họ và tên: </span><span class="font11 ho_ten_view"></span>
+			<span class="font11 tab">
+			Giới tính:<span class="gioi_tinh_view"></span><br>
+
+			<span class="TAB"></span><span class="font11">Ngày, tháng, năm sinh: <span class="ngay_sinh_view"></span></span>
+			<span class="tab2 font11">
+			Quốc tịch:
+			<span class="quoc_tich_view">Việt Nam</span>
+			</span>
+			<span class="tab1 font11">
+			Nghề nghiệp:
+			<span class="nghe_nghiep_view">Tự do</span>
+			</span><br>
+			<span class="TAB"></span><span class="font11">Nơi ở hiện tại:
+			<span class="noi_o_view"></span>
+			</span><br>
+			<span class="TAB"></span><span class="font11">Số định danh cá nhân:
+			<span class="ddcn_view"></span>
+			</span>
+
+			<span class="TAB"></span>
+
+			<span class="font11">
+			Ngày cấp:
+			<span class="ngay_cap_view"></span>
+			</span>
+
+			<span class="TAB"></span>
+
+			<span class="font11">
+			Nơi cấp:
+			<span class="noi_cap_view"></span>
+			</span>
+			<div class="print-flex-line font11"><span class="TAB"></span><span class="print-flex-fixed font_I">Tên của tổ chức:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="print-flex-line font11"><span class="TAB"></span><span class="print-flex-fixed">Địa chỉ trụ sở chính:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="font11">
+				<span class="TAB"></span>Mã số doanh nghiệp:<span class="o_nhap_3cm border print-dotted" contenteditable></span>Số GCN đăng ký đầu tư/doanh nghiệp hoặc GP thành lập/đăng ký hoạt động:	
+				<span class="TAB"></span><span class="o_nhap_3cm border print-dotted" contenteditable></span>Ngày cấp:<span class="o_nhap_2cm border print-dotted" contenteditable></span>Nơi cấp:<span class="o_nhap_2cm border print-dotted" contenteditable></span>
+			</div>
+			<div class="print-flex-line font11"><span class="TAB"></span><span class="print-flex-fixed">Người đại diện theo pháp luật:</span><span class="o_nhap_3cm border print-dotted" contenteditable></span><span class="tab"></span><span class="print-flex-fixed">Giới tính:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="print-flex-line font11"><span class="TAB"></span><span class="print-flex-fixed">Chức danh:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+
+			<span class="TAB"></span><span class="font11">2. Việc trả lại <span class=" font_I">&lt;tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề&gt;</span> đã tạm giữ theo thủ tục hành chính được lập thành biên bản kèm theo Quyết định này.</span><br>
+			<span class="TAB"></span><span class="font11">3. Việc mở niêm phong tang vật, phương tiện vi phạm hành chính đã tạm giữ theo thủ tục hành chính được lập thành biên bản kèm theo Quyết định này (nếu có).<br>
+			<span class="TAB"></span><span class="font11">4. Lý do trả lại<span class "font_I"> &lt;<span class = "font_I">tang  vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề</span>&gt;: </span><br><span class="o_nhap_n_dong border" style="text-indent: 1cm;" contenteditable>+ Quyết định xử phạt được thi hành</span><br>
+			<span class="TAB"></span><span class="font11 fontBold">Điều 2.</span><span class="font11"> Quyết định này có hiệu lực thi hành kể từ ngày ký.</span><br>
+			<span class="TAB"></span><span class="font11 fontBold">Điều 3.</span><span class="font11"> Quyết định này được:</span><br>
+			<span class="TAB"></span><span class="font11">1. Giao cho ông (bà): <span class="ho_ten_view"></span> là &lt;<span class = "font_I">cá nhân/người đại diện của tổ chức</span>&gt; được trả lại &lt;<span class = "font_I">tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề</span>&gt; có tên tại Điều 1 Quyết định này để chấp hành.</span><br>
+			<span class="TAB"></span><span class="font11">&lt;<span class = "font_I">Ông (bà)/Tổ chức</span>&gt;  <span class="ho_ten_view"></span> có quyền khiếu nại hoặc khởi kiện hành chính đối với Quyết định này theo quy định của pháp luật.<br>
+			<span class="TAB"></span><span class="font11">2. Gửi cho <span class="o_nhap_3cm border" contenteditable>Công an xã Tân Hà Lâm Hà</span> để tổ chức thực hiện.</span><br>
+			<span class="TAB"></span><span class="font11">3. Gửi cho <span class="o_nhap_3cm border" contenteditable></span>để biết và phối hợp thực hiện./.</span><br>
+			<table class="khung_chu_ky">
+				<tbody><tr>
+					<td class="fontBold font_I ta_left lh_1">
+						<span>Nơi nhận:</span><br>
+						<span class="fontNorm font8 font_I ">
+- Như Điều 3;<br>
+- Lưu: Hồ sơ.<br>
+</span><br>
+					</td>
+					<td class="ta_center lh_1">
+						<span>TRƯỞNG CÔNG AN XÃ<br>
+					<span class="fontNorm font8 font_I">
+						(Ký, đóng dấu (nếu có); ghi rõ họ và tên)
+					</td>
+				</tr>
+			</tbody></table>
+			<div class="page_break"></div>
+			<div class="font10 ta_center">Quyết định đã giao trực tiếp cho <span class="font_I">(cá nhân/người đại diện của tổ chức)</span> bị áp dụng biện pháp ngăn chặn tạm giữ <span class="font_I">(tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề)</span> vào hồi  .... giờ .... phút, ngày ……/……/…….</div><br>
+			<div class="nguoi_nhan_qd">
+    <div class="fontBold">NGƯỜI NHẬN QUYẾT ĐỊNH</div>
+    <div class="font10 font_I">(Ký, ghi rõ họ và tên)</div>
+</div
+</div>
+</div>
+</div>
+<div class="page_break"></div>
+<!--------------Page4------------------------>
+<body class="font14 ta_jus">
+	<div class="wrapper border">
+		<div class="header">
+			<div class="cq_banhanh f_left ta_center font11">
+				<span style="display:block;height:0.8em"></span>
+
+				<span contenteditable class="co_quan">CÔNG AN TỈNH LÂM ĐỒNG</span><br>
+				<span contenteditable class=" fontBold Co_quan">CÔNG AN XÃ TÂN HÀ LÂM HÀ</span><br>
+				
+				<div style='min-height:1px;border-top:1px solid black; width: 1.5cm;margin:0 auto' ></div>
+				Số: <span class="o_nhap_1cm ta_left border" contenteditable=""></span>/BB-TL</span>
+			</div>
+			<div class="td_bieumau ta_center f_right lh_06" style='margin-right:1.5cm'>
+				<span class="font10 ">Mẫu quyết định sô 17</span><br>
+			</div>
+			<div class="quochieu ta_center f_left">
+				
+				<span class="fontUpper fontBold font11">cộng hòa xã hội chủ nghĩa Việt nam</span><br>
+				
+				<span class="fontBold font11 ">Độc lập - Tự do - Hạnh phúc</span>
+				<hr style="width: 4.5cm;border: none;border-top: 1px solid black;margin:0 auto;height: 0;">
+			</div>
+
+		</div>
+		<div class="content">
+			<div class="font11	 fontBold ta_center fontUpper clear"><br>BIÊN BẢN</div>
+			<div class="font11	 ta_center">Trả lại tang vật, phương tiện vi phạm hành chính,<br>giấy phép, chứng chỉ hành nghề bị tạm giữ</div>
+			<br>
+			<span class="font11 ">Thi hành Quyết định số: <span class="o_nhap_3cm border" contenteditable></span>/QĐ-TL ngày <span class="o_nhap_3cm border" contenteditable></span> của <span class="o_nhap_3cm border" contenteditable></span><br>trả lại tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề bị tạm giữ.</span><br>
+			<span class="font11">Hôm nay, hồi <span class="o_nhap_1cm border" contenteditable></span> giờ <span class="o_nhap_1cm border" contenteditable></span>, ngày <span class="o_nhap_3cm border" contenteditable></span>, tại <span class="o_nhap_3cm border" contenteditable></span><br>
+			<span class="font11 fontBold">Chúng tôi gồm:</span><br>
+			<span class="font11">1. Người có thẩm quyền lập biên bản:</span><br>
+			
+			<span class="font11" >
+			<span class="font11">
+			Họ và tên:
+			<select id="can_bo_lap" onchange="var t=(this.value!=='')?this.options[this.selectedIndex].text:''; var n=this.nextElementSibling; if(n&&n.classList.contains('print-only')) n.innerText=t;">
+				<option value="">-- Chọn --</option>
+				<option value="1">Kiều Xuân Cảnh</option>
+				<option value="2">Lê Việt Hòa</option>
+				<option value="2">Trần Đức Anh</option>
+				<option value="3">Hà Đức Khánh</option>
+			</select><span class="print-only border print-dotted"></span>
+			</span>
+			<span class="tab1 font11">Chức vụ: Cán bộ 
+			
+			
+			<span class="tab2 font11">
+			Cơ quan: Công an xã Tân Hà Lâm Hà</span>
+			<br>
+			<span class="font11 ">2.<span class="font_I "> &ltÔng (bà)/tổ chức&gt &lt;là chủ sở hữu/người quản lý/ người sử dụng hợp pháp&gt</span> được nhận lại <span class="font_I ">&lttang vật/ phương tiện vi phạm hành chính/giấy phép/ chứng chỉ hành nghề&gt</span> đã bị giữ:</span><br>
+			<span class="font11 font_I">Họ và tên: </span><span class="font11 ho_ten_view"></span>
+			<span class="font11 tab">
+			Giới tính:<span class="gioi_tinh_view"></span><br>
+
+			<span class="font11">Ngày, tháng, năm sinh: <span class="ngay_sinh_view"></span></span>
+			<span class="tab2 font11">
+			Quốc tịch:
+			<span class="quoc_tich_view">Việt Nam</span>
+			</span>
+			<span class="tab1 font11">
+			Nghề nghiệp:
+			<span class="nghe_nghiep_view">Tự do</span>
+			</span><br>
+			<span class="font11">Nơi ở hiện tại:
+			<span class="noi_o_view"></span>
+			</span><br>
+			<span class="font11">Số định danh cá nhân:
+			<span class="ddcn_view"></span>
+			</span>
+
+			<span class="font11 tab1	">
+			Ngày cấp:
+			<span class="ngay_cap_view"></span>
+			</span>
+
+			<span class="TAB"></span>
+
+			<span class="font11">
+			Nơi cấp:
+			<span class="noi_cap_view"></span>
+			</span>
+			<div class="print-flex-line font11"><span class="print-flex-fixed font_I">Tên của tổ chức:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="print-flex-line font11"><span class="print-flex-fixed">Địa chỉ trụ sở chính:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="font11">
+			<div class="print-flex-line font11"><span class="print-flex-fixed">Mã số doanh nghiệp:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="print-flex-line font11"><span class="print-flex-fixed">Số GCN đăng ký đầu tư/doanh nghiệp hoặc GP thành lập/đăng ký hoạt động:	</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+				<div class="print-flex-line font10"><span class="print-flex-fixed">Ngày cấp:&nbsp;</span><span class="o_nhap_3cm border" contenteditable></span>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">Nơi cấp&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div></div>
+			<div class="print-flex-line font11"><span class="print-flex-fixed">Người đại diện theo pháp luật:</span><span class="o_nhap_3cm border print-dotted" contenteditable></span><span class="tab1"></span><span class="print-flex-fixed">Giới tính:</span><span class="o_nhap_3cm border print-dotted" contenteditable></span><span class="print-flex-fixed">Chức danh:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<span class="font11 fontBold">Trả lại và lập biên bản trả lại( tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề) theo Quyết định số:<span class=" o_nhap_1cm dong border" contenteditable></span>/QĐ-TL.</span><br>
+			<span class="font11 font_I">1. Tang vật, phương tiện vi phạm hành chính bị tạm giữ theo thủ tục hành chính được trả lại gồm:</span><br>
+			<table style="width:100%; border-collapse:collapse; font11;">
+    <tr>
+        <th style="border:1px solid #000; width:1.2cm; text-align:center;">STT</th>
+        <th style="border:1px solid #000; width:4cm;text-align:center;">Tên tang vật, phương<br>tiện vi phạm hành<br>chính</th>
+        <th style="border:1px solid #000; width:1.5cm; text-align:center;">Đơn vị<br>tính</th>
+        <th style="border:1px solid #000; width:1.5cm; text-align:center;">Số<br>lượng</th>
+        <th style="border:1px solid #000; width:2cm;text-align:center;">Chủng<br>loại</th>
+        <th style="border:1px solid #000; width:6cm;text-align:center;">Tình trạng / đặc điểm</th>
+        <th style="border:1px solid #000;text-align:center;">Ghi chú</th>
+    </tr>
+
+    <!-- DÒNG 1 -->
+    <tr>
+        <td style="border:1px solid #000; text-align:center;">...</td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000; text-align:center"></td>
+        <td style="border:1px solid #000; text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+    </tr>
+
+    <!-- DÒNG 2 -->
+    <tr>
+        <td style="border:1px solid #000; text-align:center;">... </td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000; text-align:center"></td>
+        <td style="border:1px solid #000; text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+    </tr>
+
+    <!-- DÒNG 3 -->
+    <tr>
+        <td style="border:1px solid #000; text-align:center;"> ...</td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000; text-align:center"></td>
+        <td style="border:1px solid #000; text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+    </tr>
+</table>
+<span class="font11 font_I">2. Giấy phép, chứng chỉ hành nghề bị tạm giữ theo thủ tục hành chính được trả lại gồm:</span><br>
+			<table style="width:100%; border-collapse:collapse; font11;">
+    <tr>
+        <th style="border:1px solid #000; width:1.2cm; text-align:center;">STT</th>
+        <th style="border:1px solid #000; width:7cm;text-align:center;">Tên giấy phép, chứng chỉ hành nghề</th>
+        <th style="border:1px solid #000; width:1.5cm; text-align:center;">Số lượng</th>
+        <th style="border:1px solid #000; width:6cm;text-align:center;">Tình trạng / đặc điểm</th>
+        <th style="border:1px solid #000;text-align:center;">Ghi chú</th>
+    </tr>
+
+    <!-- DÒNG 1 -->
+    <tr>
+        <td style="border:1px solid #000; text-align:center;">1</td>
+        <td style="border:1px solid #000;text-align:center"><span class="o_nhap_3cm border" contenteditable></td>
+        <td style="border:1px solid #000;text-align:center"><span class="o_nhap_1cm border" contenteditable></td>
+        <td style="border:1px solid #000;text-align:center"><span class="o_nhap_3cm border" contenteditable></td>
+        <td style="border:1px solid #000;text-align:center"><span class="o_nhap_2cm border" contenteditable></td>
+    </tr>
+
+    <!-- DÒNG 2 -->
+    <tr>
+        <td style="border:1px solid #000; text-align:center;">...</td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+    </tr>
+
+    <!-- DÒNG 3 -->
+    <tr>
+        <td style="border:1px solid #000; text-align:center;">...</td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+        <td style="border:1px solid #000;text-align:center"></td>
+    </tr>
+</table>
+			<span class="font11">3. Ý kiến bổ sung(nếu có):<br><span class="o_nhap_n_dong border" contenteditable></span><br>
+			<span class="font11">Biên bản lập xong hồi <span class="o_nhap_1cm border" contenteditable></span> giờ <span class="o_nhap_1cm border" contenteditable></span>, ngày <span class="o_nhap_3cm border" contenteditable></span>, gồm <span class="o_nhap_0_5cm border" contenteditable>01</span> tờ, được lập thành <span class="o_nhap_0_5cm border" contenteditable>02</span> bản có nội dung và giá trị như nhau; đã đọc lại cho những người có tên nêu trên cùng nghe, công nhận là đúng và cùng ký tên dưới đây; giao cho ông (bà) </span><span class="font11 ho_ten_view"></span> là <span class=" font_I">&ltcá nhân/ người đại diện của tổ chức&gt</span> được nhận lại <span class=" font_I">&lttang vật/ phương tiện vi phạm hành chính/ giấy phép/ chứng chỉ hành nghề&gt</span> 01 bản, 01 bản lưu hồ sơ.</span><br>
+			<table class="khung_chu_ky">
+				<tbody><tr>
+					<td class="ta_center lh_1">
+						<span>CÁ NHÂN/ NGƯỜI ĐẠI DIỆN<br>CỦA TỔ CHỨC ĐƯỢC NHẬN LẠI <br>
+						<span class="fontNorm font10 font_I">
+						(Ký, ghi rõ họ và tên)
+					</td>
+					<td class="ta_center lh_1">
+						<span>NGƯỜI LẬP BIÊN BẢN<br>
+						<span class="fontNorm font10 font_I">
+						(Ký, ghi rõ chức vụ, họ và tên)
+					</td>
+				</tr>
+			</tbody></table>
+			<div class="page_break"></div>
+			<div class="font10 ta_center">Quyết định đã giao trực tiếp cho cá nhân bị xử phạt vào hồi .... giờ .... phút, ngày ……/……/…….</div><br>
+			<div class="nguoi_nhan_qd">
+    <div class="fontBold">NGƯỜI NHẬN QUYẾT ĐỊNH</div>
+    <div class="font10 fontI">(Ký, ghi rõ họ và tên)</div>
+</div
+</div>
+</div>
+</div>
+	<img src="./Image/print.png" class="button_print" width="50px" height="50px" onclick="In_bieu_mau();"><br>
+    <img src="./Image/save.png" class="button_save" width="45px" height="45px" onclick="save()"><br>
+    <img src="./Image/qr.png" class="button_reload" onclick="document.getElementById('qr_input').click();"><br>
+</body>
+</html>
+

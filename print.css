@@ -1,0 +1,80 @@
+@media print {
+	.bien_nhan_cuoi_trang { margin-top: 22cm !important; }
+  .page_break{
+      page-break-after: always;
+      break-after: page;
+      height:0;
+      margin:0;
+      padding:0;
+  }
+
+	 body{margin:0;background:none;line-height:1.2em;font-family:Times New Roman;}
+	
+	 /*.wrapper{ margin-bottom:2cm;page-break-inside:avoid;font-size:16pt;margin-top:5mm}*/
+	 .wrapper{ margin-bottom:2cm;page-break-inside:avoid;}
+ 
+	.wrapperB7c{}
+	 .border{border: none;font-family:Times New Roman}
+	select {-webkit-appearance: none;-moz-appearance: none;text-indent: 1px;text-overflow: '';border: none;color:black}
+	#btn_ghichu,.edit_font,.button_print,.button_save,.button_reload{display:none}
+	#gioi_tinh{ display:none; }
+	.wrapper{box-shadow:none}
+	._input{display:none;}
+	.ghichu{display:inline;}
+	.content_page_2{page-break-before:always;}
+	.content2_mau_pa{page-break-before:always; }
+	.content3_mau_pa{page-break-before:always; }
+	.content_mau_pcd{page-break-before:always; }
+	.content2_mau_pcd{page-break-before:always; }
+	.content_page_2_BL6{page-break-before:always;}
+	.o_nhap_n_dong{display:block;font-family:"Times New Roman",Times,serif;font-size:inherit}
+	.ghi_chu_chan_trang{margin-bottom:1.5cm}
+	.ghichu_font15{ color:black}
+	/* placeholder mặc định */
+	[contenteditable]{
+		position: relative;
+	}
+
+	/* khi RỖNG thì tạo viền chấm đứt dưới cùng thay cho dấu chấm */
+	[contenteditable]:empty {
+		border: none !important;
+		border-bottom: 1px dotted black !important;
+		display: inline-block !important;
+		height: 0.85em !important;
+		min-height: 0.85em !important;
+		line-height: 0.85em !important;
+		vertical-align: baseline !important;
+		align-self: baseline !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		box-sizing: border-box !important;
+	}
+
+	/* Xóa text placeholder cứng để không bị đè lên */
+	[contenteditable]:empty::before{
+		content: "";
+	}
+
+	/* khi focus (bắt đầu gõ) thì ẨN .... (giữ lại cho an toàn) */
+	[contenteditable]:focus::before{
+		content: "";
+	}
+
+
+
+	.hr1{height:1px; background-color:black;border:none;}
+	.footer1{position:absolute;top:24.5cm;right:1cm;left:2cm;}
+	.footer2{position:absolute;top:57.5cm;right:1cm;left:2cm;}
+	.footer2_b1{position:absolute;top:56.5cm;right:1cm;left:2cm;}
+	.footer1_b1{position:absolute;top:23cm;right:1cm;left:2cm;}
+	.footer1_b8{position:absolute;top:24.5cm;right:1cm;left:2cm;}
+	.footer1_b9{position:absolute;top:25cm;right:1cm;left:2cm;}
+	.footer1_b11{position:absolute;top:23cm;right:1cm;left:2cm;}
+	.footer1_b15{position:absolute;top:26cm;right:1cm;left:2cm;}
+	.footer1_B16{position:absolute;top:24cm;right:1cm;left:2cm;}
+	.footer1_B17{position:absolute;top:27cm;right:1cm;left:2cm;}
+	
+	.td_bieumau{}
+	.ghichu_mau_pa_trang_1{position:absolute;top:27cm}
+	.ghichu_mau_pa_trang_2{position:absolute;top:58.5cm}
+}
