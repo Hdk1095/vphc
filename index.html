@@ -153,6 +153,14 @@
 			syncGioiTinh();
 			set_gt_from_qr(gioiTinh);
 		}
+		
+		function autoFormatDate(el){
+			let str = el.innerText.trim().replace(/\D/g, "");
+			if(str.length === 8){
+				el.innerText = str.substring(0,2) + "/" + str.substring(2,4) + "/" + str.substring(4);
+			}
+		}
+
 		function formatDate(d){
 			if(!d || d.length !== 8) return d;
 			return d.substring(0,2)+"/"+d.substring(2,4)+"/"+d.substring(4);
@@ -565,7 +573,7 @@ select, option {
 				<hr style="width: 4.5cm;border: none;border-top: 1px solid black;margin:0 auto;height: 0;">
 			</div>
 			<div class="time_header font11 font_I">
-				<span class="dia_danh" >Tân Hà Lâm Hà</span>, ngày <span class="o_nhap_ngay border" contenteditable=""></span> tháng <span class="o_nhap_thang border" contenteditable=""></span> năm <span class="o_nhap_nam border" contenteditable=""></span>
+				<span class="dia_danh" >Tân Hà Lâm Hà</span>, ngày <span class="o_nhap_ngay border" contenteditable=""></span> tháng <span class="o_nhap_thang border" contenteditable=""></span> năm <span class="o_nhap_nam border" contenteditable="">2026</span>
 			</div>
 		</div>
 		<div class="content">
@@ -579,12 +587,12 @@ select, option {
 			<span class="font10 font_I">Căn cứ Biên bản vi phạm hành chính số: <span class="o_nhap_0_5cm border" contenteditable></span>/BB-VPHC lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span></span><br>
 			<span class="font10 font_I">Căn cứ Biên bản phiên giải trình trực tiếp số: <span class="o_nhap_0_5cm border" contenteditable></span>/BB-GTTT lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span>(nếu có)</span><br>
 			<span class="font10 font_I">Căn cứ Biên bản số: <span class="o_nhap_0_5cm border" contenteditable></span>/BB-XM lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span>xác minh tình tiết của vụ việc vi phạm hành chính</span><br>
-			<span class="font10 font_I">Căn cứ Quyết định số: <span class="o_nhap_0_5cm border" contenteditable></span>/QĐ-GQXP ngày  <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> về việc giao quyền xử phạt vi phạm hành chính.</span>
+			<span class="font10 font_I">Căn cứ Quyết định số: <span class="o_nhap_0_5cm border" contenteditable>04</span>/QĐ-GQXP ngày  <span class="o_nhap_ngay border" contenteditable>20</span> tháng <span class="o_nhap_thang border" contenteditable>01</span> năm <span class="o_nhap_nam border" contenteditable>2026</span> về việc giao quyền xử phạt vi phạm hành chính.</span>
 			<div class="font11	fontBold ta_center fontUpper clear"><br>QUYẾT ĐỊNH</div>
 			<span class="font10 fontBold">Điều 1.<br>
 			</span><span class="font10">1. Xử phạt vi phạm hành chính đối với ông/bà có tên sau đây:</span>
 			<div class="print-flex-line font10">
-				<span class="print-flex-fixed">Họ và tên:&nbsp;</span><span class="o_nhap_2cm border" contenteditable id="ho_ten_input" onkeyup="syncHoTen()"></span>
+				<span class="print-flex-fixed">Họ và tên:&nbsp;</span><span class="fontBold o_nhap_2cm border" contenteditable id="ho_ten_input" onkeyup="syncHoTen()" style="text-transform: capitalize;"></span>
 				<span class="TAB"></span>
 				<span class="print-flex-fixed">&nbsp;Giới tính:&nbsp;</span>
 				<select id="gioi_tinh" onchange="syncGioiTinh()">
@@ -594,7 +602,7 @@ select, option {
 				</select><span class="print-only border print-dotted"></span>
 				<span class="TAB"></span>
 				<span class="print-flex-fixed">&nbsp;Ngày, tháng, năm sinh:&nbsp;</span>
-				<span class="o_nhap_2cm border" contenteditable id="ngay_sinh_input" onkeyup="syncNgaySinh()"></span>
+				<span class="o_nhap_2cm border" contenteditable id="ngay_sinh_input" onkeyup="syncNgaySinh()" onblur="autoFormatDate(this); syncNgaySinh();"></span>
 			</div>
 			<div class="print-flex-line font10">
 				<span class="print-flex-fixed">Quốc tịch:&nbsp;</span><span class="o_nhap_2cm border" contenteditable id="quoc_tich_input" onkeyup="syncQuocTich()">Việt Nam</span>
@@ -607,7 +615,7 @@ select, option {
 			<div class="print-flex-line font10">
 				<span class="print-flex-fixed">Số định danh cá nhân:&nbsp;</span><span class="o_nhap_3cm border" contenteditable id="ddcn_input" onkeyup="syncDDCN()"></span>
 				<span class="TAB"></span>
-				<span class="print-flex-fixed">Ngày cấp:&nbsp;</span><span class="o_nhap_2cm border" contenteditable id="ngay_cap_input" onkeyup="syncNgayCap()"></span>
+				<span class="print-flex-fixed">Ngày cấp:&nbsp;</span><span class="o_nhap_2cm border" contenteditable id="ngay_cap_input" onkeyup="syncNgayCap()" onblur="autoFormatDate(this); syncNgayCap();"></span>
 				<span class="TAB"></span>
 				<span class="print-flex-fixed">Nơi cấp:&nbsp;</span>
 				<select id="noi_cap_input" onchange="syncNoiCap(); var t=this.options[this.selectedIndex].text; if(this.value=='')t=''; document.querySelectorAll('.noi_cap_view').forEach(e=>e.innerText=t);">
@@ -617,29 +625,29 @@ select, option {
 				</select><span class="print-only border print-dotted"></span>
 			</div>
 			<div class="font10" style="line-height: 1.25em; margin: 0; padding: 0;">2. Đã thực hiện hành vi vi phạm hành chính:<br><span class="o_nhap_n_dong border" contenteditable></span></div>
-			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">3. Quy định tại: <span class="o_nhap_3cm border" contenteditable></span>Nghị định 168/2024/NĐ-CP ngày 26/12/2024 được sửa đổi, bổ sung theo nghị định 238/2026/NĐ-CP ngày 26/06/2026 của Chính phủ quy định xử phạt vi phạm hành chính về trật tự, an toàn giao thông trong lĩnh vực giao thông đường bộ.</div>
-			<div class="print-flex-line font10"><span class="print-flex-fixed">4. Các tình tiết tăng nặng (nếu có):&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
-			<div class="print-flex-line font10"><span class="print-flex-fixed">5. Các tình tiết giảm nhẹ (nếu có):&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">3. Quy định tại: <span class="o_nhap_3cm border" contenteditable></span> Nghị định 168/2024/NĐ-CP ngày 26/12/2024 được sửa đổi, bổ sung theo nghị định 238/2026/NĐ-CP ngày 26/06/2026 của Chính phủ quy định xử phạt vi phạm hành chính về trật tự, an toàn giao thông trong lĩnh vực giao thông đường bộ.</div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">4. Các tình tiết tăng nặng (nếu có):&nbsp;</span><span class="font_I o_nhap_3cm border print-dotted print-flex-fill" contenteditable>Không</span></div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">5. Các tình tiết giảm nhẹ (nếu có):&nbsp;</span><span class="font_I o_nhap_3cm border print-dotted print-flex-fill" contenteditable>Không</span></div>
 			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">6. Bị áp dụng hình thức xử phạt, biện pháp khắc phục hậu quả như sau:</div>
 			<div class="print-flex-line font10"><span class="print-flex-fixed">a) Hình thức xử phạt chính:&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable>Phạt tiền</span></div>
 			<div class="print-flex-line font10"><span class="print-flex-fixed">Cụ thể:&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable>Mức tiền phạt: 500.000 đồng</span></div>
-			<div class="print-flex-line font10"><span class="print-flex-fixed">b) Hình thức xử phạt bổ sung (nếu có):&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">b) Hình thức xử phạt bổ sung (nếu có):&nbsp;</span><span class="font_I o_nhap_3cm border print-dotted print-flex-fill" contenteditable>Không</span></div>
 			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">Thời hạn thực hiện hình thức xử phạt bổ sung là <span class="o_nhap_3cm border" contenteditable></span> ngày/tháng, kể từ ngày nhận được Quyết định này.</div>
-			<div class="print-flex-line font10"><span class="print-flex-fixed">c) Biện pháp khắc phục hậu quả (nếu có):&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">c) Biện pháp khắc phục hậu quả (nếu có):&nbsp;</span><span class="font_I o_nhap_3cm border print-dotted print-flex-fill" contenteditable>Không</span></div>
 			<div class="print-flex-line font10"><span class="print-flex-fixed">Cụ thể:&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
 			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">Thời hạn thực hiện biện pháp khắc phục hậu quả <span class="o_nhap_3cm border" contenteditable></span> ngày, kể từ ngày nhận được Quyết định này.</div>
-			<div class="print-flex-line font10"><span class="print-flex-fixed">Những nội dung trực tiếp liên quan đến việc thực hiện biện pháp khắc phục hậu quả (nếu có):&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
+			<div class="print-flex-line font10"><span class="print-flex-fixed">Những nội dung trực tiếp liên quan đến việc thực hiện biện pháp khắc phục hậu quả (nếu có):&nbsp;</span><span class="font_I o_nhap_3cm border print-dotted print-flex-fill" contenteditable>Không</span></div>
 			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">Mọi chi phí tổ chức thi hành biện pháp khắc phục hậu quả do ông bà bị xử phạt có tên tại Điều này chi trả</div>
 			<div class="print-flex-line font10"><span class="print-flex-fixed">Ông/bà có tên tại Điều này phải hoàn trả số kinh phí là:&nbsp;</span><span class="o_nhap_3cm border" contenteditable></span>
 			<div class="print-flex-line font10"><span class="print-flex-fixed">Cho&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div></div>
 			<div class="font10" style="line-height: 1.2em; margin: 0; padding: 0;">là cơ quan đã thực hiện biện pháp khắc phục hậu quả theo quy định tại khoản 5 Điều 85 Luật Xử lý vi phạm hành chính.</div>
 			<span class="font10 fontBold">Điều 2.</span><span class="font10"> Quyết định này có hiệu lực thi hành kể từ ký.</span><br>
 			<span class="font10 fontBold">Điều 3.</span><span class="font10"> Quyết định này được:</span><br>
-			<span class="font10">1. Giao cho ông/bà  <span class="ho_ten_view"></span> là cá nhân bị xử phạt có tên tại Điều 1 Quyết định này để chấp hành.</span><br>
-			<span class="font10">Ông/bà có tên tại Điều 1 phải nghiêm chỉnh chấp hành Quyết định xử phạt này. Nếu quá thời hạn mà ông/bà <span class="ho_ten_view"></span> không tự nguyện chấp hành thì sẽ bị cưỡng chế thi hành theo quy định của pháp luật.</span><br>
+			<span class="font10">1. Giao cho ông/bà  <span class="fontBold ho_ten_view"></span> là cá nhân bị xử phạt có tên tại Điều 1 Quyết định này để chấp hành.</span><br>
+			<span class="font10">Ông/bà có tên tại Điều 1 phải nghiêm chỉnh chấp hành Quyết định xử phạt này. Nếu quá thời hạn mà ông/bà <span class="fontBold ho_ten_view"></span> không tự nguyện chấp hành thì sẽ bị cưỡng chế thi hành theo quy định của pháp luật.</span><br>
 			<span class="font10">Hoặc ông/bà  bị xử phạt có tên tại Điều 1 nộp tiền phạt tại chỗ cho người đã ra quyết định xử phạt theo quy định tại khoản 2 Điều 78 
 Luật Xử lý vi phạm hành chính.</span><br>
-			<span class="font10">b) Ông/bà bị xử phạt có tên tại Điều 1 bị tạm giữ <span class="o_nhap_3cm border" contenteditable></span> để bảo đảm thi hành quyết định xử phạt.</span><br>
+			<span class="font10">b) Ông/bà bị xử phạt có tên tại Điều 1 bị tạm giữ <span class="font_I o_nhap_3cm border" contenteditable></span> để bảo đảm thi hành quyết định xử phạt.</span><br>
 			<span class="font10">c) Ông/bà có tên tại Điều 1 có quyền khiếu nại hoặc khởi kiện hành chính đối với Quyết định này theo quy định của pháp luật.<br>
 			<span class="font10">2. Gửi cho Ngân hàng Agribank Lâm Hà, địa chỉ: Đường Hùng Vương, xã Đinh Văn Lâm Hà, tỉnh Lâm Đồng để thu tiền phạt.</span><br>
 			<span class="font10">3. Gửi cho tổ Cảnh sát trật tự để tổ chức thực hiện.</span><br>
@@ -711,7 +719,7 @@ Luật Xử lý vi phạm hành chính.</span><br>
 			<div class="font11	fontBold ta_center fontUpper clear"><br>QUYẾT ĐỊNH</div>
 			<span class="TAB"></span><span class="font11 fontBold">Điều 1.<br></span>
 			<span class="TAB"></span><span class="font11">1. Tạm giữ  <span class="font_I">(tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề)</span>  đối với <span class="font_I">(ông (bà)/tổ chức)</span> có tên sau đây:</span><br>
-			<span class="TAB"></span><span class="font11">Họ và tên: <span class="ho_ten_view"></span><span class="TAB font11"></span>
+			<span class="TAB"></span><span class="font11">Họ và tên: <span class="fontBold ho_ten_view" ></span><span class="TAB font11"></span>
 			<span class="font11 tab">
 			Giới tính:<span class="gioi_tinh_view"></span><br>
 
@@ -762,9 +770,9 @@ lý vi phạm hành chính số 15/2012/QH13 được sửa đổi, bổ sung b�
 			<span class="TAB"></span><span class="font11">6.Việc niêm phong tang vật, phương tiện vi phạm hành chính bị tạm giữ theo thủ tục hành chính được lập thành biên bản kèm theo Quyết định này <span class="font_I">(nếu có).</span><br>
 			<span class="TAB"></span><span class="font11 fontBold">Điều 2.</span><span class="font11"> Quyết định này có hiệu lực thi hành kể từ ký.</span><br>
 			<span class="TAB"></span><span class="font11 fontBold">Điều 3.</span><span class="font11"> Quyết định này được:</span><br>
-			<span class="TAB"></span><span class="font11">1. Giao cho ông (bà): <span class="ho_ten_view"></span> là  (cá nhân/người đại diện của tổ chức)  bị áp dụng biện pháp ngăn chặn tạm giữ  (tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề) có tên tại Điều 1 Quyết định này để chấp hành.</span><br>
+			<span class="TAB"></span><span class="font11">1. Giao cho ông (bà): <span class="fontBold ho_ten_view"></span> là  (cá nhân/người đại diện của tổ chức)  bị áp dụng biện pháp ngăn chặn tạm giữ  (tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề) có tên tại Điều 1 Quyết định này để chấp hành.</span><br>
 			<span class="TAB"></span><span class="font11">a) Ông (bà)/Tổ chức bị áp dụng biện pháp ngăn chặn tạm giữ (tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề) có tên tại Điều 1 phải nghiêm chỉnh chấp hành Quyết định này.<br>
-			<span class="TAB"></span><span class="font11">b) Ông (bà)/Tổ chức  <span class="ho_ten_view"></span> có quyền khiếu nại hoặc khởi kiện hành chính đối với Quyết định này theo quy định của pháp luật.<br>
+			<span class="TAB"></span><span class="font11">b) Ông (bà)/Tổ chức  <span class="fontBold ho_ten_view"></span> có quyền khiếu nại hoặc khởi kiện hành chính đối với Quyết định này theo quy định của pháp luật.<br>
 			<span class="TAB"></span><span class="font11">2. Gửi cho <span class="o_nhap_3cm border" contenteditable>Công an xã Tân Hà Lâm Hà </span> để tổ chức thực hiện.</span><br>
 			<span class="TAB"></span><span class="font11">3. Gửi cho <span class="o_nhap_3cm border" contenteditable></span>để biết và phối hợp thực hiện./.</span><br>
 			<table class="khung_chu_ky">
@@ -830,13 +838,13 @@ giấy phép, chứng chỉ hành nghề bị tạm giữ
 			<div class="font11	 fontBold ta_center fontUpper clear"><br>TRƯỞNG CÔNG AN XÃ TÂN HÀ LÂM HÀ</div>
 			<br>
 			<span class="TAB"></span><span class="font11 font_I">Căn cứ Điều 126 Luật Xử lý vi phạm hành chính (sửa đổi, bổ sung năm 2020 và năm 2025);</span><br>
-			<span class="TAB"></span><span class="font11 font_I">Căn cứ Biên bản số: <span class="o_nhap_0_5cm border" contenteditable></span>/QD-TG lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> tạm giữ tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề;</span><br>
+			<span class="TAB"></span><span class="font11 font_I">Căn cứ Biên bản số: <span class="o_nhap_0_5cm border" contenteditable></span>/QĐ-TG lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> tạm giữ tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề;</span><br>
 			<span class="TAB"></span><span class="font11 font_I">Căn cứ Quyết định số: <span class="o_nhap_0_5cm border" contenteditable></span>/QĐ-KDTG ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> kéo dài thời hạn tạm giữ tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề (nếu có);</span><br>
 			<span class="TAB"></span><span class="font11 font_I">Căn cứ Quyết định số: <span class="o_nhap_0_5cm border" contenteditable></span>/QĐ-GQXP ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> về việc giao quyền xử phạt vi phạm hành chính (nếu có).</span><br>
 			<div class="font11	fontBold ta_center fontUpper clear"><br>QUYẾT ĐỊNH</div>
 			<span class="TAB"></span><span class="font11 fontBold">Điều 1.<br></span>
 			<span class="TAB"></span><span class = "font11 ">1. Trả lại <span class = "font_I">&lt;tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề&gt;</span> đã bị tạm giữ theo Quyết định số: <span class="o_nhap_1cm border" contenteditable></span>/QĐ-TG &lt;và Quyết định số: <span class="o_nhap_1cm border" contenteditable></span>QĐ-KDTG&gt; cho <span class = "font_I">&lt;ông (bà)/ tổ chức&gt; </span>có tên sau đây:</span><br>
-			<span class="TAB"></span><span class="font11 font_I">Họ và tên: </span><span class="font11 ho_ten_view"></span>
+			<span class="TAB"></span><span class="font11 font_I">Họ và tên: </span><span class="fontBold font11 ho_ten_view"></span>
 			<span class="font11 tab">
 			Giới tính:<span class="gioi_tinh_view"></span><br>
 
@@ -883,8 +891,8 @@ giấy phép, chứng chỉ hành nghề bị tạm giữ
 			<span class="TAB"></span><span class="font11">4. Lý do trả lại<span class "font_I"> &lt;<span class = "font_I">tang  vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề</span>&gt;: </span><br><span class="o_nhap_n_dong border" style="text-indent: 1cm;" contenteditable>+ Quyết định xử phạt được thi hành</span>
 			<span class="TAB"></span><span class="font11 fontBold">Điều 2.</span><span class="font11"> Quyết định này có hiệu lực thi hành kể từ ngày ký.</span><br>
 			<span class="TAB"></span><span class="font11 fontBold">Điều 3.</span><span class="font11"> Quyết định này được:</span><br>
-			<span class="TAB"></span><span class="font11">1. Giao cho ông (bà): <span class="ho_ten_view"></span> là &lt;<span class = "font_I">cá nhân/người đại diện của tổ chức</span>&gt; được trả lại &lt;<span class = "font_I">tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề</span>&gt; có tên tại Điều 1 Quyết định này để chấp hành.</span><br>
-			<span class="TAB"></span><span class="font11">&lt;<span class = "font_I">Ông (bà)/Tổ chức</span>&gt;  <span class="ho_ten_view"></span> có quyền khiếu nại hoặc khởi kiện hành chính đối với Quyết định này theo quy định của pháp luật.<br>
+			<span class="TAB"></span><span class="font11">1. Giao cho ông (bà): <span class="fontBold ho_ten_view"></span> là &lt;<span class = "font_I">cá nhân/người đại diện của tổ chức</span>&gt; được trả lại &lt;<span class = "font_I">tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề</span>&gt; có tên tại Điều 1 Quyết định này để chấp hành.</span><br>
+			<span class="TAB"></span><span class="font11">&lt;<span class = "font_I">Ông (bà)/Tổ chức</span>&gt;  <span class="fontBold ho_ten_view"></span> có quyền khiếu nại hoặc khởi kiện hành chính đối với Quyết định này theo quy định của pháp luật.<br>
 			<span class="TAB"></span><span class="font11">2. Gửi cho <span class="o_nhap_3cm border" contenteditable>Công an xã Tân Hà Lâm Hà</span> để tổ chức thực hiện.</span><br>
 			<span class="TAB"></span><span class="font11">3. Gửi cho <span class="o_nhap_3cm border" contenteditable></span>để biết và phối hợp thực hiện./.</span><br>
 			<table class="khung_chu_ky">
@@ -943,8 +951,8 @@ giấy phép, chứng chỉ hành nghề bị tạm giữ
 			<div class="font11	 fontBold ta_center fontUpper clear"><br>BIÊN BẢN</div>
 			<div class="font11	fontBold ta_center">Trả lại tang vật, phương tiện vi phạm hành chính,<br>giấy phép, chứng chỉ hành nghề bị tạm giữ</div>
 			<hr style="width: 4.5cm; border: none; border-top: 1px solid black; margin: 0 auto; height: 0;"><br>
-			<span class="font11 ">Thi hành Quyết định số: <span class="o_nhap_3cm border" contenteditable></span>/QĐ-TL ngày <span class="o_nhap_3cm border" contenteditable></span> của <span class="o_nhap_3cm border" contenteditable></span><br>trả lại tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề bị tạm giữ.</span><br>
-			<span class="font11">Hôm nay, hồi <span class="o_nhap_1cm border" contenteditable></span> giờ <span class="o_nhap_1cm border" contenteditable></span>, ngày <span class="o_nhap_3cm border" contenteditable></span>, tại <span class="o_nhap_3cm border" contenteditable></span><br>
+			<span class="font11 ">Thi hành Quyết định số: <span class="o_nhap_3cm border" contenteditable></span>/QĐ-TL ngày <span class="o_nhap_3cm border" contenteditable></span> của <span class="o_nhap_3cm border" contenteditable>Công an xã Tân Hà Lâm Hà</span><br> trả lại tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề bị tạm giữ.</span><br>
+			<span class="font11">Hôm nay, hồi <span class="o_nhap_1cm border" contenteditable></span> giờ <span class="o_nhap_1cm border" contenteditable></span>, ngày <span class="o_nhap_3cm border" contenteditable></span>, tại <span class="o_nhap_3cm border" contenteditable>Công an xã Tân Hà Lâm Hà</span><br>
 			<span class="font11 fontBold">Chúng tôi gồm:</span><br>
 			<span class="font11">1. Người có thẩm quyền lập biên bản:</span><br>
 			
@@ -966,7 +974,7 @@ giấy phép, chứng chỉ hành nghề bị tạm giữ
 			Cơ quan: Công an xã Tân Hà Lâm Hà</span>
 			<br>
 			<span class="font11 ">2.<span class="font_I "> &ltÔng (bà)/tổ chức&gt &lt;là chủ sở hữu/người quản lý/ người sử dụng hợp pháp&gt</span> được nhận lại <span class="font_I ">&lttang vật/ phương tiện vi phạm hành chính/giấy phép/ chứng chỉ hành nghề&gt</span> đã bị giữ:</span><br>
-			<span class="font11 font_I">Họ và tên: </span><span class="font11 ho_ten_view"></span>
+			<span class="font11 font_I">Họ và tên: </span><span class="fontBold font11 ho_ten_view"></span>
 			<span class="font11 tab">
 			Giới tính:<span class="gioi_tinh_view"></span><br>
 
@@ -1089,7 +1097,7 @@ giấy phép, chứng chỉ hành nghề bị tạm giữ
     </tr>
 </table>
 			<div class="print-flex-line font10"><span class="print-flex-fixed">3. Ý kiến bổ sung(nếu có):&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
-			<span class="font11">Biên bản lập xong hồi <span class="o_nhap_1cm border" contenteditable></span> giờ <span class="o_nhap_1cm border" contenteditable></span>, ngày <span class="o_nhap_3cm border" contenteditable></span>, gồm <span class="o_nhap_0_5cm border" contenteditable>01</span> tờ, được lập thành <span class="o_nhap_0_5cm border" contenteditable>02</span> bản có nội dung và giá trị như nhau; đã đọc lại cho những người có tên nêu trên cùng nghe, công nhận là đúng và cùng ký tên dưới đây; giao cho ông (bà) </span><span class="font11 ho_ten_view"></span> là <span class=" font_I">&ltcá nhân/ người đại diện của tổ chức&gt</span> được nhận lại <span class=" font_I">&lttang vật/ phương tiện vi phạm hành chính/ giấy phép/ chứng chỉ hành nghề&gt</span> 01 bản, 01 bản lưu hồ sơ.</span><br>
+			<span class="font11">Biên bản lập xong hồi <span class="o_nhap_1cm border" contenteditable></span> giờ <span class="o_nhap_1cm border" contenteditable></span>, ngày <span class="o_nhap_3cm border" contenteditable></span>, gồm <span class="o_nhap_0_5cm border" contenteditable>01</span> tờ, được lập thành <span class="o_nhap_0_5cm border" contenteditable>02</span> bản có nội dung và giá trị như nhau; đã đọc lại cho những người có tên nêu trên cùng nghe, công nhận là đúng và cùng ký tên dưới đây; giao cho ông (bà) </span><span class="fontBold font11 ho_ten_view"></span> là <span class=" font_I">&ltcá nhân/ người đại diện của tổ chức&gt</span> được nhận lại <span class=" font_I">&lttang vật/ phương tiện vi phạm hành chính/ giấy phép/ chứng chỉ hành nghề&gt</span> 01 bản, 01 bản lưu hồ sơ.</span><br>
 			<table class="khung_chu_ky">
 				<tbody><tr>
 					<td class="ta_center lh_1">
