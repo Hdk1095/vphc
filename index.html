@@ -279,10 +279,14 @@ function load_page(){
 				URL.revokeObjectURL(a.href);
 			}	
 		/*---------------------------------------------------------------------------------------HÀM LOAD PAGE-------------------------------------------------------------------------------*/  		
-			 function In_bieu_mau(){
+			 
+        
+        
+        			function In_bieu_mau(){
 					window.print();
-					
 				}
+
+
     
 	
                 function syncAllSelectsForPrint() {
@@ -304,11 +308,11 @@ function load_page(){
             });
         });
 
-        window.addEventListener('beforeprint', function() {
+                window.addEventListener('beforeprint', function() {
             syncAllSelectsForPrint();
         });
 
-    const DEFAULT_APP_PWD = "112233";
+        const DEFAULT_APP_PWD = "112233";
 
     function checkAuth() {
         const pwdInput = document.getElementById("auth_password");
@@ -350,7 +354,81 @@ function load_page(){
     }
 
     window.addEventListener("DOMContentLoaded", initAuth);
+	/* Đồng bộ Số biên bản VPHC */
+function syncSoBB(){
+    const v = document.getElementById("so_bb_input").innerText.trim();
+    document.querySelectorAll(".so_bb_view").forEach(el => el.innerText = v);
+}
+
+/* Đồng bộ Ngày lập biên bản */
+function syncNgayBB(){
+    const v = document.getElementById("ngay_bb_input").innerText.trim();
     
+    // 1. Đồng bộ GIỮ NGUYÊN ngày (nhập 25 -> ra 25)
+    document.querySelectorAll(".ngay_bb_view").forEach(el => el.innerText = v);
+    
+    // 2. Đồng bộ TỰ ĐỘNG TRỪ 1 NGÀY (nhập 25 -> tự ra 24, nhập 05 -> tự ra 04)
+    let dayNum = parseInt(v, 10);
+    let prevDay = "";
+    if (!isNaN(dayNum) && dayNum > 1) {
+        let d = dayNum - 1;
+        prevDay = (d < 10 ? "0" + d : d.toString()); // Giữ số 0 ở đầu nếu < 10 (ví dụ: 04)
+    } else if (dayNum === 1) {
+        prevDay = "30"; // Nếu ngày 1 trừ 1 thì lùi về cuối tháng trước
+    }
+    
+    document.querySelectorAll(".ngay_tru_1_view").forEach(el => el.innerText = prevDay);
+}
+
+/* Đồng bộ Tháng lập biên bản */
+function syncThangBB(){
+    const v = document.getElementById("thang_bb_input").innerText.trim();
+    document.querySelectorAll(".thang_bb_view").forEach(el => el.innerText = v);
+}
+
+/* Đồng bộ Năm lập biên bản */
+function syncNamBB(){
+    const v = document.getElementById("nam_bb_input").innerText.trim();
+    document.querySelectorAll(".nam_bb_view").forEach(el => el.innerText = v);
+}
+/* Hàm tính tự động 7 ngày làm việc (bỏ qua Thứ 7, Chủ Nhật) */
+function autoTinhThoiHanTamGiu() {
+    // Lấy ngày, tháng, năm từ các ô nhập ở Trang 1
+    const dVal = document.getElementById("ngay_bb_input") ? document.getElementById("ngay_bb_input").innerText.trim() : "";
+    const mVal = document.getElementById("thang_bb_input") ? document.getElementById("thang_bb_input").innerText.trim() : "";
+    const yVal = document.getElementById("nam_bb_input") ? document.getElementById("nam_bb_input").innerText.trim() : "";
+
+    const d = parseInt(dVal, 10);
+    const m = parseInt(mVal, 10);
+    const y = parseInt(yVal, 10);
+
+    if (isNaN(d) || isNaN(m) || isNaN(y)) return;
+
+    // 1. "Từ ngày" = Lùi 1 ngày so với ngày lập
+    let curDate = new Date(y, m - 1, d);
+    curDate.setDate(curDate.getDate() - 1);
+
+    // Định dạng hiển thị Từ ngày (DD/MM/YYYY)
+    let tuNgayStr = String(curDate.getDate()).padStart(2, '0') + '/' + String(curDate.getMonth() + 1).padStart(2, '0') + '/' + curDate.getFullYear();
+
+    // 2. Tính tiếp 7 ngày làm việc (ngày bắt đầu tính là 1 ngày, cần tìm thêm 6 ngày làm việc nữa)
+    let count = (curDate.getDay() !== 0 && curDate.getDay() !== 6) ? 1 : 0;
+
+    while (count < 7) {
+        curDate.setDate(curDate.getDate() + 1);
+        let dayOfWeek = curDate.getDay(); // 0 là Chủ Nhật, 6 là Thứ Bảy
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+            count++;
+        }
+    }
+
+    // Định dạng hiển thị Đến ngày (DD/MM/YYYY)
+    let denNgayStr = String(curDate.getDate()).padStart(2, '0') + '/' + String(curDate.getMonth() + 1).padStart(2, '0') + '/' + curDate.getFullYear();
+
+    // Đồng bộ vào các vị trí hiển thị trên mẫu
+    document.querySelectorAll(".tu_ngay_tam_giu_view").forEach(el => el.innerText = tuNgayStr);
+    document.querySelectorAll(".den_ngay_tam_giu_view").forEach(el => el.innerText = denNgayStr);
+}
 </script>
 <input type="file"
        accept="image/*"
@@ -539,6 +617,9 @@ table td, table td [contenteditable], table td span {
     text-align-last: center !important;
 }
 
+
+
+
 </style>
 </head>
 
@@ -557,7 +638,7 @@ table td, table td [contenteditable], table td span {
     </div>
 </div>
 
-	<div class="wrapper border">
+	<div class="wrapper border" id="page_1_wrapper">
 		<div class="header">
 			<div class="cq_banhanh f_left ta_center font11">
 				<span style="display:block;height:0.8em"></span>
@@ -566,7 +647,7 @@ table td, table td [contenteditable], table td span {
 				<span contenteditable class=" fontBold Co_quan">CÔNG AN XÃ TÂN HÀ LÂM HÀ</span><br>
 				
 				<div style='min-height:1px;border-top:1px solid black; width: 1.5cm;margin:0 auto' ></div>
-				Số: <span class="o_nhap_1cm ta_left border" contenteditable=""></span>/QĐ-XPHC</span>
+				Số: <span class="o_nhap_1cm border" contenteditable id="so_bb_input" onkeyup="syncSoBB()"></span>/QĐ-XPHC
 			</div>
 			<div class="td_bieumau ta_center f_right lh_06" style='margin-right:1.5cm; padding-top: 1px;'>
 				<span class="font10 ">Mẫu quyết định số 02</span><br>
@@ -579,7 +660,7 @@ table td, table td [contenteditable], table td span {
 				<hr style="width: 4.5cm;border: none;border-top: 1px solid black;margin:0 auto;height: 0;">
 			</div>
 			<div class="time_header font11 font_I">
-				<span class="dia_danh" >Tân Hà Lâm Hà</span>, ngày <span class="o_nhap_ngay border" contenteditable=""></span> tháng <span class="o_nhap_thang border" contenteditable=""></span> năm <span class="o_nhap_nam border" contenteditable="">2026</span>
+				<span class="dia_danh" >Tân Hà Lâm Hà</span>, ngày <span class="o_nhap_ngay border" contenteditable id="ngay_bb_input" onkeyup="syncNgayBB(); autoTinhThoiHanTamGiu();"></span> tháng <span class="o_nhap_thang border" contenteditable id="thang_bb_input" onkeyup="syncThangBB(); autoTinhThoiHanTamGiu();"></span> năm <span class="o_nhap_nam border" contenteditable id="nam_bb_input" onkeyup="syncNamBB(); autoTinhThoiHanTamGiu();"></span>
 			</div>
 		</div>
 		<div class="content">
@@ -590,7 +671,7 @@ table td, table td [contenteditable], table td span {
 			<br>
 			<span class="font10 font_I">Căn cứ Điều 57, Điều 68, Điều 70, Điều 78, Điều 85 Luật Xử lý vi phạm hành chính (sửa đổi, bổ sung năm 2020;2025);</span><br>
 			<span class="font10 font_I">Căn cứ Nghị định số:168/2024/NĐ-CP ngày 26/12/2024 được sửa đổi, bổ sung theo nghị định 238/2026/NĐ-CP ngày 26/06/2026 của Chính phủ quy định xử phạt vi phạm hành chính về trật tự, an toàn giao thông trong lĩnh vực giao thông đường bộ;</span><br>
-			<span class="font10 font_I">Căn cứ Biên bản vi phạm hành chính số: <span class="o_nhap_0_5cm border" contenteditable></span>/BB-VPHC lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span></span><br>
+			<span class="font10 font_I">Căn cứ Biên bản vi phạm hành chính số: <span class="so_bb_view"></span>/BB-VPHC lập ngày <span class="ngay_tru_1_view"></span> tháng <span class="thang_bb_view"></span> năm <span class="nam_bb_view"></span></span><br>
 			<span class="font10 font_I">Căn cứ Biên bản phiên giải trình trực tiếp số: <span class="o_nhap_0_5cm border" contenteditable></span>/BB-GTTT lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span>(nếu có)</span><br>
 			<span class="font10 font_I">Căn cứ Biên bản số: <span class="o_nhap_0_5cm border" contenteditable></span>/BB-XM lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span>xác minh tình tiết của vụ việc vi phạm hành chính</span><br>
 			<span class="font10 font_I">Căn cứ Quyết định số: <span class="o_nhap_0_5cm border" contenteditable>04</span>/QĐ-GQXP ngày  <span class="o_nhap_ngay border" contenteditable>20</span> tháng <span class="o_nhap_thang border" contenteditable>01</span> năm <span class="o_nhap_nam border" contenteditable>2026</span> về việc giao quyền xử phạt vi phạm hành chính.</span>
@@ -687,7 +768,7 @@ Luật Xử lý vi phạm hành chính.</span><br>
 
 <!--------------Page2------------------------>
 <body class="font14 ta_jus">
-	<div class="wrapper border mau_20">
+	<div class="wrapper border mau_20" id="page_2_wrapper">
 		<div class="header">
 			<div class="cq_banhanh f_left ta_center font11">
 				<span style="display:block;height:0.8em"></span>
@@ -696,7 +777,7 @@ Luật Xử lý vi phạm hành chính.</span><br>
 				<span contenteditable class=" fontBold Co_quan">CÔNG AN XÃ TÂN HÀ LÂM HÀ</span><br>
 				
 				<div style='min-height:1px;border-top:1px solid black; width: 1.5cm;margin:0 auto' ></div>
-				Số: <span class="o_nhap_1cm ta_left border" contenteditable=""></span>/QĐ-TG</span>
+				Số: <span class="so_bb_view"></span>/QĐ-TG</span>
 			</div>
 			<div class="td_bieumau ta_center f_right lh_06" style='margin-right:1.5cm; padding-top: 1px;'>
 				<span class="font10 ">Mẫu quyết định số 20</span><br>
@@ -709,7 +790,7 @@ Luật Xử lý vi phạm hành chính.</span><br>
 				<hr style="width: 4.5cm;border: none;border-top: 1px solid black;margin:0 auto;height: 0;">
 			</div>
 			<div class="time_header font11 font_I">
-				<span class="dia_danh" >Tân Hà Lâm Hà</span>, ngày <span class="o_nhap_ngay border" contenteditable=""></span> tháng <span class="o_nhap_thang border" contenteditable=""></span> năm <span class="o_nhap_nam border" contenteditable="">2026</span>
+				<span class="dia_danh" >Tân Hà Lâm Hà</span>, ngày <span class="ngay_bb_view"></span> tháng <span class="thang_bb_view"></span> năm <span class="nam_bb_view"></span>
 			</div>
 		</div>
 		<div class="content">
@@ -720,7 +801,7 @@ Luật Xử lý vi phạm hành chính.</span><br>
 			<div class="font11	 fontBold ta_center fontUpper clear"><br>TRƯỞNG CÔNG AN XÃ TÂN HÀ LÂM HÀ</div>
 			<br>
 			<span class="TAB"></span><span class="font11 font_I">Căn cứ Điều 125 Luật Xử lý vi phạm hành chính (sửa đổi, bổ sung năm 2020 và năm 2025);</span><br>
-			<span class="TAB"></span><span class="font11 font_I">Căn cứ Biên bản số: <span class="o_nhap_0_5cm border" contenteditable></span>/BB-TG lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> tạm giữ tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề/Biên bản vi phạm hành chính số: <span class="o_nhap_1cm border" contenteditable></span>/BB-VPHC lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span></span><br>
+			<span class="TAB"></span><span class="font11 font_I">Căn cứ Biên bản số: <span class="o_nhap_0_5cm border" contenteditable></span>/BB-TG lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> tạm giữ tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề/Biên bản vi phạm hành chính số: <span class="so_bb_view"></span>/BB-VPHC lập ngày <span class="ngay_tru_1_view"></span> tháng <span class="thang_bb_view"></span> năm <span class="nam_bb_view"></span></span><br>
 			<span class="TAB"></span><span class="font11 font_I">Căn cứ Quyết định số: <span class="o_nhap_0_5cm border" contenteditable>04</span>/QĐ-GQXP ngày  <span class="o_nhap_ngay border" contenteditable>20</span> tháng <span class="o_nhap_thang border" contenteditable>01</span> năm <span class="o_nhap_nam border" contenteditable>2026</span>về việc giao quyền xử phạt vi phạm hành chính (nếu có).</span><br>
 			<div class="font11	fontBold ta_center fontUpper clear"><br>QUYẾT ĐỊNH</div>
 			<span class="TAB"></span><span class="font11 fontBold">Điều 1.<br></span>
@@ -771,7 +852,7 @@ Luật Xử lý vi phạm hành chính.</span><br>
 			<span class="o_nhap_n_dong border" style="text-indent: 1cm;" contenteditable> + Để bảo đảm thi hành quyết định xử phạt theo quy định tại khoản 6 và khoản 7 Điều 125 Luật Xử
 lý vi phạm hành chính số 15/2012/QH13 được sửa đổi, bổ sung bởi Luật số 67/2020/QH14 và Luật số
 88/2025/QH15</span>
-			<span class="TAB"></span><span class="font11">4. Thời hạn tạm giữ: <span class="o_nhap_0_5cm border" contenteditable> 07 </span>ngày, từ ngày <span class="o_nhap_1cm border" contenteditable></span> đến ngày <span class="o_nhap_1cm border" contenteditable></span><br>
+			<span class="TAB"></span><span class="font11">4. Thời hạn tạm giữ: <span class="o_nhap_0_5cm border" contenteditable> 07 </span>ngày, từ ngày <span class="tu_ngay_tam_giu_view fontBold"></span> đến ngày <span class="den_ngay_tam_giu_view fontBold"></span></span><br>
 			<span class="TAB"></span><span class="font11">5. Địa điểm tạm giữ: <span class="o_nhap_3cm border" contenteditable>Công an xã Tân Hà Lâm Hà, Tỉnh Lâm Đồng</span><br>
 			<span class="TAB"></span><span class="font11">6.Việc niêm phong tang vật, phương tiện vi phạm hành chính bị tạm giữ theo thủ tục hành chính được lập thành biên bản kèm theo Quyết định này <span class="font_I">(nếu có).</span><br>
 			<span class="TAB"></span><span class="font11 fontBold">Điều 2.</span><span class="font11"> Quyết định này có hiệu lực thi hành kể từ ký.</span><br>
@@ -810,7 +891,7 @@ lý vi phạm hành chính số 15/2012/QH13 được sửa đổi, bổ sung b�
 <div class="page_break"></div>
 <!--------------Page3------------------------>
 <body class="font14 ta_jus">
-	<div class="wrapper border">
+	<div class="wrapper border" id="page_3_wrapper">
 		<div class="header">
 			<div class="cq_banhanh f_left ta_center font11">
 				<span style="display:block;height:0.8em"></span>
@@ -819,7 +900,7 @@ lý vi phạm hành chính số 15/2012/QH13 được sửa đổi, bổ sung b�
 				<span contenteditable class=" fontBold Co_quan">CÔNG AN XÃ TÂN HÀ LÂM HÀ</span><br>
 				
 				<div style='min-height:1px;border-top:1px solid black; width: 1.5cm;margin:0 auto' ></div>
-				Số: <span class="o_nhap_1cm ta_left border" contenteditable=""></span>/QĐ-TL</span>
+				Số: <span class="so_bb_view"></span>/QĐ-TL</span>
 			</div>
 			<div class="td_bieumau ta_center f_right lh_06" style='margin-right:1.5cm; padding-top: 1px;'>
 				<span class="font10 ">Mẫu quyết định số 24</span><br>
@@ -832,7 +913,7 @@ lý vi phạm hành chính số 15/2012/QH13 được sửa đổi, bổ sung b�
 				<hr style="width: 4.5cm;border: none;border-top: 1px solid black;margin:0 auto;height: 0;">
 			</div>
 			<div class="time_header font11 font_I">
-				<span class="dia_danh" >Tân Hà Lâm Hà</span>, ngày <span class="o_nhap_ngay border" contenteditable=""></span> tháng <span class="o_nhap_thang border" contenteditable=""></span> năm <span class="o_nhap_nam border" contenteditable="">2026</span>
+				<span class="dia_danh" >Tân Hà Lâm Hà</span>, ngày .... tháng ..... năm 2026</span>
 			</div>
 		</div>
 		<div class="content">
@@ -844,12 +925,12 @@ giấy phép, chứng chỉ hành nghề bị tạm giữ
 			<div class="font11	 fontBold ta_center fontUpper clear"><br>TRƯỞNG CÔNG AN XÃ TÂN HÀ LÂM HÀ</div>
 			<br>
 			<span class="TAB"></span><span class="font11 font_I">Căn cứ Điều 126 Luật Xử lý vi phạm hành chính (sửa đổi, bổ sung năm 2020 và năm 2025);</span><br>
-			<span class="TAB"></span><span class="font11 font_I">Căn cứ Biên bản số: <span class="o_nhap_0_5cm border" contenteditable></span>/QĐ-TG lập ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> tạm giữ tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề;</span><br>
+			<span class="TAB"></span><span class="font11 font_I">Căn cứ Biên bản số: <span class="so_bb_view"></span>/QĐ-TG lập ngày <span class="ngay_bb_view"></span> tháng <span class="thang_bb_view"></span> năm <span class="nam_bb_view"></span> tạm giữ tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề;</span><br>
 			<span class="TAB"></span><span class="font11 font_I">Căn cứ Quyết định số: <span class="o_nhap_0_5cm border" contenteditable></span>/QĐ-KDTG ngày <span class="o_nhap_ngay border" contenteditable></span> tháng <span class="o_nhap_thang border" contenteditable></span> năm <span class="o_nhap_nam border" contenteditable></span> kéo dài thời hạn tạm giữ tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề (nếu có);</span><br>
 			<span class="TAB"></span><span class="font11 font_I">Căn cứ Quyết định số: <span class="o_nhap_0_5cm border" contenteditable>04</span>/QĐ-GQXP ngày <span class="o_nhap_ngay border" contenteditable>20</span> tháng <span class="o_nhap_thang border" contenteditable>01</span> năm <span class="o_nhap_nam border" contenteditable>2026</span> về việc giao quyền xử phạt vi phạm hành chính (nếu có).</span><br>
 			<div class="font11	fontBold ta_center fontUpper clear"><br>QUYẾT ĐỊNH</div>
 			<span class="TAB"></span><span class="font11 fontBold">Điều 1.<br></span>
-			<span class="TAB"></span><span class = "font11 ">1. Trả lại <span class = "font_I">&lt;tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề&gt;</span> đã bị tạm giữ theo Quyết định số: <span class="o_nhap_1cm border" contenteditable></span>/QĐ-TG &lt;và Quyết định số: <span class="o_nhap_1cm border" contenteditable></span>QĐ-KDTG&gt; cho <span class = "font_I">&lt;ông (bà)/ tổ chức&gt; </span>có tên sau đây:</span><br>
+			<span class="TAB"></span><span class = "font11 ">1. Trả lại <span class = "font_I">&lt;tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề&gt;</span> đã bị tạm giữ theo Quyết định số: <span class="so_bb_view"></span>/QĐ-TG &lt;và Quyết định số: <span class="o_nhap_1cm border" contenteditable></span>QĐ-KDTG&gt; cho <span class = "font_I">&lt;ông (bà)/ tổ chức&gt; </span>có tên sau đây:</span><br>
 			<span class="TAB"></span><span class="font11 font_I">Họ và tên: </span><span class="fontBold font11 ho_ten_view"></span>
 			<span class="font11 tab">
 			Giới tính:<span class="gioi_tinh_view"></span><br>
@@ -928,9 +1009,10 @@ giấy phép, chứng chỉ hành nghề bị tạm giữ
 </div>
 </div>
 <div class="page_break"></div>
+
 <!--------------Page4------------------------>
 <body class="font14 ta_jus">
-	<div class="wrapper border">
+	<div class="wrapper border" id="page_4_wrapper">
 		<div class="header">
 			<div class="cq_banhanh f_left ta_center font11">
 				<span style="display:block;height:0.8em"></span>
@@ -939,7 +1021,7 @@ giấy phép, chứng chỉ hành nghề bị tạm giữ
 				<span contenteditable class=" fontBold Co_quan">CÔNG AN XÃ TÂN HÀ LÂM HÀ</span><br>
 				
 				<div style='min-height:1px;border-top:1px solid black; width: 1.5cm;margin:0 auto' ></div>
-				Số: <span class="o_nhap_1cm ta_left border" contenteditable=""></span>/BB-TL</span>
+				Số: <span class="so_bb_view"></span>/BB-TL</span>
 			</div>
 			<div class="td_bieumau ta_center f_right lh_06" style='margin-right:1.5cm; padding-top: 1px;'>
 				<span class="font10 ">Mẫu quyết định số 17</span><br>
@@ -957,7 +1039,7 @@ giấy phép, chứng chỉ hành nghề bị tạm giữ
 			<div class="font11	 fontBold ta_center fontUpper clear"><br>BIÊN BẢN</div>
 			<div class="font11	fontBold ta_center">Trả lại tang vật, phương tiện vi phạm hành chính,<br>giấy phép, chứng chỉ hành nghề bị tạm giữ</div>
 			<hr style="width: 4.5cm; border: none; border-top: 1px solid black; margin: 0 auto; height: 0;"><br>
-			<span class="font11 ">Thi hành Quyết định số: <span class="o_nhap_1cm border" contenteditable></span>/QĐ-TL ngày <span class="o_nhap_3cm border" contenteditable></span> của <span class="o_nhap_3cm border" contenteditable>Công an xã Tân Hà Lâm Hà</span><br> trả lại tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề bị tạm giữ.</span><br>
+			<span class="font11 ">Thi hành Quyết định số: <span class="so_bb_view"></span>/QĐ-TL ngày <span class="o_nhap_3cm border" contenteditable></span> của <span class="o_nhap_3cm border" contenteditable>Công an xã Tân Hà Lâm Hà</span><br> trả lại tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề bị tạm giữ.</span><br>
 			<span class="font11">Hôm nay, hồi <span class="o_nhap_1cm border" contenteditable></span> giờ <span class="o_nhap_1cm border" contenteditable></span>, ngày <span class="o_nhap_3cm border" contenteditable></span>, tại <span class="o_nhap_3cm border" contenteditable>Công an xã Tân Hà Lâm Hà</span><br>
 			<span class="font11 fontBold">Chúng tôi gồm:</span><br>
 			<span class="font11">1. Người có thẩm quyền lập biên bản:</span><br>
@@ -1019,7 +1101,7 @@ giấy phép, chứng chỉ hành nghề bị tạm giữ
 				<div class="print-flex-line font10"><span class="print-flex-fixed">Ngày cấp:&nbsp;</span><span class="o_nhap_3cm border" contenteditable></span>
 			<div class="print-flex-line font10"><span class="print-flex-fixed">Nơi cấp&nbsp;</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div></div>
 			<div class="print-flex-line font11"><span class="print-flex-fixed">Người đại diện theo pháp luật:</span><span class="o_nhap_3cm border print-dotted" contenteditable></span><span class="tab1"></span><span class="print-flex-fixed">Giới tính:</span><span class="o_nhap_3cm border print-dotted" contenteditable></span><span class="print-flex-fixed">Chức danh:</span><span class="o_nhap_3cm border print-dotted print-flex-fill" contenteditable></span></div>
-			<span class="font11 fontBold">Trả lại và lập biên bản trả lại( tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề) theo Quyết định số:<span class=" o_nhap_1cm dong border" contenteditable></span>/QĐ-TL.</span><br>
+			<span class="font11 fontBold">Trả lại và lập biên bản trả lại( tang vật, phương tiện vi phạm hành chính, giấy phép, chứng chỉ hành nghề) theo Quyết định số: <span class="so_bb_view"></span>/QĐ-TL.</span><br>
 			<span class="font11 font_I">1. Tang vật, phương tiện vi phạm hành chính bị tạm giữ theo thủ tục hành chính được trả lại gồm:</span><br>
 			<table style="width:100%; border-collapse:collapse; font11;">
     <tr>
@@ -1130,7 +1212,8 @@ giấy phép, chứng chỉ hành nghề bị tạm giữ
 </div>
 </div>
 </div>
-	<img src="./Image/print.png" class="button_print" width="50px" height="50px" onclick="In_bieu_mau();"><br>
+	
+<img src="./Image/print.png" class="button_print" width="50px" height="50px" onclick="In_bieu_mau();"><br>
     <img src="./Image/save.png" class="button_save" width="45px" height="45px" onclick="save()"><br>
     <img src="./Image/qr.png" class="button_reload" onclick="document.getElementById('qr_input').click();"><br>
 </body>
