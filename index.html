@@ -456,6 +456,10 @@ function autoTinhThoiHanTamGiu() {
     font-size: inherit !important;
 }
 @media print {
+	    span[style*="red"] {
+        border: none !important;
+    }
+
     /* Cỡ chữ tăng 1 size khi in chuẩn văn bản (10pt -> 11pt, 11pt -> 12pt) */
     .font10 { font-size: 11pt !important; }
     .font11 { font-size: 13pt !important; }
