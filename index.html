@@ -612,9 +612,28 @@ select, option {
         #auth_overlay { display: none !important; }
     }
 
-table td, table td [contenteditable], table td span {
-    text-align: center !important; text-align-last: center !important;
+/* Căn giữa ô nhập liệu cho bảng tang vật / giấy phép ở Trang 4 */
+table:not(.khung_chu_ky) td,
+table:not(.khung_chu_ky) td [contenteditable],
+table:not(.khung_chu_ky) td span {
+    text-align: center !important;
     text-align-last: center !important;
+}
+
+/* Phần Nơi nhận ở khung chữ ký luôn căn thẳng lề trái chuẩn văn bản */
+table.khung_chu_ky td.ta_left,
+table.khung_chu_ky td.ta_left * {
+    text-align: left !important;
+    text-align-last: left !important;
+}
+table.khung_chu_ky td.ta_left {
+    padding-left: 0 !important;
+}
+
+/* Riêng Mẫu quyết định 20 và 24: Nơi nhận thụt vào 1 tab (1cm) thẳng hàng với chữ "Điều 3" */
+#page_2_wrapper table.khung_chu_ky td.ta_left,
+#page_3_wrapper table.khung_chu_ky td.ta_left {
+    padding-left: 1cm !important;
 }
 
 
